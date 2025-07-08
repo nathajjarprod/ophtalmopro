@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CORS eID Bridge</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Test CORS eID Bridge</h1>
+        
+        <div class="status info">
+            <p>Cette page permet de tester les problèmes CORS avec l'API eID Bridge.</p>
+            <p>Ouvrez la console développeur (F12) pour voir les détails des erreurs.</p>
+        </div>
+
+        <h2>🔧 Tests de Connectivité</h2>
+        
+        <button onclick="testWithFetch()">Test Fetch Standard</button>
+        <button onclick="testWithCredentials()">Test avec Credentials</button>
+        <button onclick="testWithHeaders()">Test avec Headers</button>
+        <button onclick="testWithCORS()">Test CORS Complet</button>
+        
+        <div id="results"></div>
+
+        <h2>🔍 Diagnostic CORS</h2>
+        
+        <button onclick="checkCORSHeaders()">Vérifier Headers CORS</button>
+        <button onclick="testPreflightRequest()">Test Preflight OPTIONS</button>
+        <button onclick="testWithXMLHttpRequest()">Test avec XMLHttpRequest</button>
+        
+        <div id="diagnosticResults"></div>
+
+        <h2>📋 Solutions Possibles</h2>
+        <div class="status info">
+            <p><strong>Si vous rencontrez des erreurs CORS:</strong></p>
+            <ol>
+                <li>Vérifiez que votre domaine est dans la liste des origines autorisées</li>
+                <li>Assurez-vous que le middleware CORS est correctement configuré</li>
+                <li>Vérifiez que les headers CORS sont correctement renvoyés</li>
+                <li>Testez avec une requête OPTIONS pour vérifier le preflight</li>
+            </ol>
+        </div>
+
+        <h2>💻 Code d'Exemple</h2>
+        <pre><code>// Configuration CORS correcte dans Startup.cs
+services.AddCors(options =>
+{
+    options.AddPolicy("LocalhostOnly", builder =>
+    {
+        builder
+            .WithOrigins(
+                "https://localhost:5173",
+                "https://localhost:3000",
+                "https://127.0.0.1:5173",
+                "https://127.0.0.1:3000",
+                "https://localhost:8443",
+                "https://127.0.0.1:8443"
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials()
+            .SetIsOriginAllowedToAllowWildcardSubdomains();
+    });
+});</code></pre>
+    </div>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+        const diagnosticResultsDiv = document.getElementById('diagnosticResults');
+        const apiUrl = 'https://localhost:8443/api/status';
+        
+        function showResult(title, content, type = 'info', targetDiv = resultsDiv) {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${title}</strong><br><pre>${typeof content === 'string' ? content : JSON.stringify(content, null, 2)}</pre>`;
+            targetDiv.appendChild(div);
+        }
+        
+        function showLoading(message, targetDiv = resultsDiv) {
+            const div = document.createElement('div');
+            div.className = 'status info';
+            div.innerHTML = `<div class="loading"></div> ${message}`;
+            targetDiv.appendChild(div);
+            return div;
+        }
+        
+        async function testWithFetch() {
+            const loading = showLoading('Test fetch standard...');
+            
+            try {
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                loading.remove();
+                showResult('✅ Fetch Standard', data, 'success');
+                
+                console.log('Fetch standard réussi:', data);
+            } catch (error) {
+                loading.remove();
+                showResult('❌ Erreur Fetch', error.message, 'error');
+                
+                console.error('Erreur fetch standard:', error);
+            }
+        }
+        
+        async function testWithCredentials() {
+            const loading = showLoading('Test avec credentials...');
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                loading.remove();
+                showResult('✅ Fetch avec Credentials', data, 'success');
+                
+                console.log('Fetch avec credentials réussi:', data);
+            } catch (error) {
+                loading.remove();
+                showResult('❌ Erreur Credentials', error.message, 'error');
+                
+                console.error('Erreur fetch avec credentials:', error);
+            }
+        }
+        
+        async function testWithHeaders() {
+            const loading = showLoading('Test avec headers personnalisés...');
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Custom-Header': 'test-value'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                loading.remove();
+                showResult('✅ Fetch avec Headers', data, 'success');
+                
+                console.log('Fetch avec headers réussi:', data);
+            } catch (error) {
+                loading.remove();
+                showResult('❌ Erreur Headers', error.message, 'error');
+                
+                console.error('Erreur fetch avec headers:', error);
+            }
+        }
+        
+        async function testWithCORS() {
+            const loading = showLoading('Test CORS complet...');
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Custom-Header': 'test-value'
+                    },
+                    credentials: 'include',
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                loading.remove();
+                showResult('✅ CORS Complet', data, 'success');
+                
+                console.log('CORS complet réussi:', data);
+            } catch (error) {
+                loading.remove();
+                showResult('❌ Erreur CORS', error.message, 'error');
+                
+                console.error('Erreur CORS complet:', error);
+            }
+        }
+        
+        async function checkCORSHeaders() {
+            const loading = showLoading('Vérification des headers CORS...', diagnosticResultsDiv);
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'GET'
+                });
+                
+                const headers = {};
+                for (const [key, value] of response.headers.entries()) {
+                    headers[key] = value;
+                }
+                
+                loading.remove();
+                
+                // Vérifier les headers CORS
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': headers['access-control-allow-origin'] || 'Non présent',
+                    'Access-Control-Allow-Methods': headers['access-control-allow-methods'] || 'Non présent',
+                    'Access-Control-Allow-Headers': headers['access-control-allow-headers'] || 'Non présent',
+                    'Access-Control-Allow-Credentials': headers['access-control-allow-credentials'] || 'Non présent'
+                };
+                
+                const corsOK = headers['access-control-allow-origin'] !== undefined;
+                
+                showResult(
+                    corsOK ? '✅ Headers CORS Présents' : '⚠️ Headers CORS Manquants', 
+                    corsHeaders, 
+                    corsOK ? 'success' : 'warning',
+                    diagnosticResultsDiv
+                );
+                
+                console.log('Headers CORS:', corsHeaders);
+            } catch (error) {
+                loading.remove();
+                showResult('❌ Erreur Vérification', error.message, 'error', diagnosticResultsDiv);
+                
+                console.error('Erreur vérification headers:', error);
+            }
+        }
+        
+        async function testPreflightRequest() {
+            const loading = showLoading('Test requête preflight OPTIONS...', diagnosticResultsDiv);
+            
+            try {
+                // Simuler une requête OPTIONS
+                const response = await fetch(apiUrl, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'GET',
+                        'Access-Control-Request-Headers': 'Content-Type, X-Custom-Header',
+                        'Origin': window.location.origin
+                    }
+                });
+                
+                const headers = {};
+                for (const [key, value] of response.headers.entries()) {
+                    headers[key] = value;
+                }
+                
+                loading.remove();
+                
+                const preflightOK = response.ok && 
+                                   headers['access-control-allow-origin'] !== undefined &&
+                                   headers['access-control-allow-methods'] !== undefined;
+                
+                showResult(
+                    preflightOK ? '✅ Preflight OK' : '⚠️ Preflight Problème', 
+                    {
+                        status: response.status,
+                        statusText: response.statusText,
+                        headers: headers
+                    }, 
+                    preflightOK ? 'success' : 'warning',
+                    diagnosticResultsDiv
+                );
+                
+                console.log('Réponse preflight:', {
+                    status: response.status,
+                    headers: headers
+                });
+            } catch (error) {
+                loading.remove();
+                showResult('❌ Erreur Preflight', error.message, 'error', diagnosticResultsDiv);
+                
+                console.error('Erreur preflight:', error);
+            }
+        }
+        
+        function testWithXMLHttpRequest() {
+            const loading = showLoading('Test avec XMLHttpRequest...', diagnosticResultsDiv);
+            
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', apiUrl, true);
+            
+            xhr.onload = function() {
+                loading.remove();
+                
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try {
+                        const data = JSON.parse(xhr.responseText);
+                        showResult('✅ XMLHttpRequest OK', data, 'success', diagnosticResultsDiv);
+                        console.log('XMLHttpRequest réussi:', data);
+                    } catch (e) {
+                        showResult('⚠️ Réponse Non-JSON', xhr.responseText.substring(0, 200) + '...', 'warning', diagnosticResultsDiv);
+                        console.warn('Réponse non-JSON:', xhr.responseText);
+                    }
+                } else {
+                    showResult('❌ Erreur HTTP', `${xhr.status}: ${xhr.statusText}`, 'error', diagnosticResultsDiv);
+                    console.error('Erreur HTTP:', xhr.status, xhr.statusText);
+                }
+            };
+            
+            xhr.onerror = function() {
+                loading.remove();
+                showResult('❌ Erreur Réseau', 'Erreur réseau ou CORS', 'error', diagnosticResultsDiv);
+                console.error('Erreur réseau ou CORS');
+            };
+            
+            xhr.send();
+        }
+    </script>
+</body>
+</html>
