@@ -151,6 +151,7 @@ namespace OphtalmoPro.EidBridge
                 if (context.Request.Path == "/")
                 {
                     context.Response.ContentType = "text/html";
+                    var port = context.Request.Host.Port ?? 8443;
                     await context.Response.WriteAsync(@"
 <!DOCTYPE html>
 <html>
@@ -169,7 +170,7 @@ namespace OphtalmoPro.EidBridge
         ✅ Service opérationnel
     </div>
     <div class='status info'>
-        📡 API disponible sur : <strong>https://localhost:8443/api/</strong><br>
+        📡 API disponible sur : <strong>https://localhost:" + port + @"/api/</strong><br>
         📊 Santé du service : <a href='/health'>Vérifier</a><br>
         📚 Documentation : <a href='/api-docs'>API Docs</a>
     </div>

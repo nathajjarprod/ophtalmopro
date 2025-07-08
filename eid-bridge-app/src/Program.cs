@@ -6,11 +6,15 @@ using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System.Net;
+using System.Net.NetworkInformation;
 
 namespace OphtalmoPro.EidBridge
 {
     public class Program
     {
+        private static int _selectedPort = 8443;
+        
         public static void Main(string[] args)
         {
             // Configuration des logs
@@ -31,9 +35,13 @@ namespace OphtalmoPro.EidBridge
                 );
                 Directory.CreateDirectory(certDir);
                 
-                Console.WriteLine($"Démarrage de OphtalmoPro eID Bridge...");
-                Console.WriteLine($"Logs: {logPath}");
-                Console.WriteLine($"Certificats: {certDir}");
+                Console.WriteLine($"🚀 Démarrage de OphtalmoPro eID Bridge...");
+                Console.WriteLine($"📁 Logs: {logPath}");
+                Console.WriteLine($"🔐 Certificats: {certDir}");
+                
+                // Vérifier et trouver un port disponible
+                _selectedPort = FindAvailablePort(8443);
+                Console.WriteLine($"🌐 Port sélectionné: {_selectedPort}");
                 
                 CreateHostBuilder(args).Build().Run();
             }
@@ -51,10 +59,71 @@ namespace OphtalmoPro.EidBridge
                     Console.WriteLine($"ERREUR CRITIQUE: {ex}");
                 }
                 
-                Console.WriteLine($"Erreur au démarrage: {ex.Message}");
+                Console.WriteLine($"❌ Erreur au démarrage: {ex.Message}");
                 Console.WriteLine("Appuyez sur une touche pour continuer...");
                 Console.ReadKey();
                 throw;
+            }
+        }
+
+        private static int FindAvailablePort(int preferredPort)
+        {
+            // Tester le port préféré d'abord
+            if (IsPortAvailable(preferredPort))
+            {
+                Console.WriteLine($"✅ Port {preferredPort} disponible");
+                return preferredPort;
+            }
+
+            Console.WriteLine($"⚠️ Port {preferredPort} déjà utilisé, recherche d'un port alternatif...");
+
+            // Tester des ports alternatifs
+            var alternativePorts = new[] { 8444, 8445, 8446, 8447, 8448, 8449, 8450 };
+            
+            foreach (var port in alternativePorts)
+            {
+                if (IsPortAvailable(port))
+                {
+                    Console.WriteLine($"✅ Port alternatif trouvé: {port}");
+                    return port;
+                }
+                Console.WriteLine($"❌ Port {port} également utilisé");
+            }
+
+            // Si aucun port fixe n'est disponible, trouver un port libre automatiquement
+            var listener = new System.Net.Sockets.TcpListener(IPAddress.Loopback, 0);
+            listener.Start();
+            var dynamicPort = ((IPEndPoint)listener.LocalEndpoint).Port;
+            listener.Stop();
+            
+            Console.WriteLine($"🔄 Utilisation du port dynamique: {dynamicPort}");
+            return dynamicPort;
+        }
+
+        private static bool IsPortAvailable(int port)
+        {
+            try
+            {
+                var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+                var tcpConnInfoArray = ipGlobalProperties.GetActiveTcpListeners();
+
+                foreach (var endpoint in tcpConnInfoArray)
+                {
+                    if (endpoint.Port == port)
+                    {
+                        return false;
+                    }
+                }
+
+                // Test supplémentaire avec TcpListener
+                var listener = new System.Net.Sockets.TcpListener(IPAddress.Loopback, port);
+                listener.Start();
+                listener.Stop();
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
 
@@ -69,7 +138,7 @@ namespace OphtalmoPro.EidBridge
                     webBuilder.ConfigureKestrel(options =>
                     {
                         // Port HTTPS sécurisé
-                        options.ListenLocalhost(8443, listenOptions =>
+                        options.ListenLocalhost(_selectedPort, listenOptions =>
                         {
                             listenOptions.UseHttps(GetOrCreateCertificate());
                         });
@@ -109,7 +178,7 @@ namespace OphtalmoPro.EidBridge
             
             var certFile = Path.Combine(certPath, "bridge-cert.pfx");
             
-            Console.WriteLine($"Vérification du certificat: {certFile}");
+            Console.WriteLine($"🔍 Vérification du certificat: {certFile}");
             
             if (File.Exists(certFile))
             {
