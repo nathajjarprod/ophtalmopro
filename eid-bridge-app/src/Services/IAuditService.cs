@@ -71,7 +71,7 @@ namespace OphtalmoPro.EidBridge.Services
             }
         }
 
-        public async Task LogSecurityEventAsync(string eventType, string details, string clientIp = null)
+        public async Task LogSecurityEventAsync(string eventType, string details, string? clientIp = null)
         {
             try
             {

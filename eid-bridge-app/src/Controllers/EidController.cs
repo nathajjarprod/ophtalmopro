@@ -69,7 +69,7 @@ namespace OphtalmoPro.EidBridge.Controllers
         [HttpPost("read-card")]
         public async Task<ActionResult<EidReadResponse>> ReadCard([FromBody] EidReadRequest request)
         {
-            var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
             var requestId = Guid.NewGuid().ToString();
 
             try
@@ -120,7 +120,7 @@ namespace OphtalmoPro.EidBridge.Controllers
                 await _auditService.LogCardReadAsync(new CardReadAudit
                 {
                     RequestId = requestId,
-                    ClientIp = clientIp,
+                    ClientIp = clientIp ?? "unknown",
                     ReaderName = readerWithCard.Name,
                     Success = true,
                     DataRead = new
@@ -150,7 +150,7 @@ namespace OphtalmoPro.EidBridge.Controllers
                 await _auditService.LogCardReadAsync(new CardReadAudit
                 {
                     RequestId = requestId,
-                    ClientIp = clientIp,
+                    ClientIp = clientIp ?? "unknown",
                     Success = false,
                     Error = "Timeout",
                     Timestamp = DateTime.UtcNow
@@ -253,7 +253,7 @@ namespace OphtalmoPro.EidBridge.Controllers
         {
             try
             {
-                var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+                var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
                 
                 if (!_securityService.IsAuthorizedClient(clientIp))
                 {

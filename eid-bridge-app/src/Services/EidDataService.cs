@@ -77,15 +77,15 @@ namespace OphtalmoPro.EidBridge.Services
                 {
                     FirstName = identity.FirstName,
                     LastName = identity.LastName,
-                    DateOfBirth = FormatDate(identity.DateOfBirth),
-                    PlaceOfBirth = identity.PlaceOfBirth,
-                    Nationality = identity.Nationality,
-                    Niss = FormatNiss(identity.Niss),
-                    CardNumber = identity.CardNumber,
-                    ValidityBeginDate = FormatDate(identity.ValidityBeginDate),
-                    ValidityEndDate = FormatDate(identity.ValidityEndDate),
-                    Address = address ?? new EidAddress { Street = "", PostalCode = "", City = "", Country = "Belgique" },
-                    Photo = photo
+                    FirstName = GetJsonValue(rawData, "first_name", "firstName", "given_name") ?? "",
+                    LastName = GetJsonValue(rawData, "last_name", "lastName", "surname") ?? "",
+                    DateOfBirth = GetJsonValue(rawData, "date_of_birth", "dateOfBirth", "birth_date") ?? "",
+                    PlaceOfBirth = GetJsonValue(rawData, "place_of_birth", "placeOfBirth", "birth_place") ?? "",
+                    Nationality = GetJsonValue(rawData, "nationality", "nationalite") ?? "",
+                    Niss = GetJsonValue(rawData, "national_number", "niss", "rrn") ?? "",
+                    CardNumber = GetJsonValue(rawData, "card_number", "cardNumber", "chip_number") ?? "",
+                    ValidityBeginDate = GetJsonValue(rawData, "validity_begin_date", "validityBeginDate", "valid_from") ?? "",
+                    ValidityEndDate = GetJsonValue(rawData, "validity_end_date", "validityEndDate", "valid_until") ?? ""
                 };
 
                 _logger.LogInformation("Lecture carte eID terminée avec succès pour {FirstName} {LastName}", 

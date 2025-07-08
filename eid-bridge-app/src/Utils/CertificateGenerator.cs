@@ -32,14 +32,20 @@ namespace OphtalmoPro.EidBridge.Utils
                 )
             );
 
-            var sanBuilder = new SubjectAlternativeNameBuilder();
-            sanBuilder.AddDnsName("localhost");
-            sanBuilder.AddIpAddress(IPAddress.Loopback);
-            sanBuilder.AddIpAddress(IPAddress.IPv6Loopback);
-            
-            request.CertificateExtensions.Add(
-                new X509SubjectAlternativeNameExtension(sanBuilder.Build(), critical: false)
+            // Créer manuellement l'extension SAN pour .NET 6.0
+            var sanBuilder = new System.Text.StringBuilder();
+            sanBuilder.Append("DNS:localhost,");
+            sanBuilder.Append("IP:127.0.0.1,");
+            sanBuilder.Append("IP:::1");
+
+            // Extension SAN manuelle pour compatibilité .NET 6.0
+            var sanExtension = new X509Extension(
+                "2.5.29.17", // OID pour Subject Alternative Name
+                System.Text.Encoding.UTF8.GetBytes(sanBuilder.ToString()),
+                false
             );
+
+            request.CertificateExtensions.Add(sanExtension);
 
             // Créer le certificat auto-signé
             var certificate = request.CreateSelfSigned(
