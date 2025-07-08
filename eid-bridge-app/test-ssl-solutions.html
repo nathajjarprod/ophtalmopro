@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solutions SSL - eID Bridge</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid;
+        }
+        .success { 
+            background: #d4edda; 
+            border-left-color: #28a745; 
+            color: #155724; 
+        }
+        .error { 
+            background: #f8d7da; 
+            border-left-color: #dc3545; 
+            color: #721c24; 
+        }
+        .warning { 
+            background: #fff3cd; 
+            border-left-color: #ffc107; 
+            color: #856404; 
+        }
+        .info { 
+            background: #d1ecf1; 
+            border-left-color: #17a2b8; 
+            color: #0c5460; 
+        }
+        button {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+        button:disabled { 
+            background: #6c757d; 
+            cursor: not-allowed; 
+            transform: none;
+        }
+        .solution-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .solution-title {
+            color: #495057;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+        .badge-success { background: #28a745; color: white; }
+        .badge-warning { background: #ffc107; color: #212529; }
+        .badge-danger { background: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 Solutions SSL pour eID Bridge</h1>
+        
+        <div class="status warning">
+            <h3>⚠️ Problème SSL Identifié</h3>
+            <p>Les navigateurs modernes bloquent les certificats auto-signés. Voici plusieurs solutions pour résoudre ce problème.</p>
+        </div>
+
+        <div class="solution-card">
+            <div class="solution-title">🎯 Solution 1: Test Rapide</div>
+            <p>Testez d'abord si l'API fonctionne avec une méthode qui contourne SSL:</p>
+            <button onclick="testWithFetch()">Test Fetch Simple</button>
+            <button onclick="testWithJsonp()">Test JSONP</button>
+            <button onclick="showCurlCommand()">Commande CURL</button>
+        </div>
+
+        <div class="solution-card">
+            <div class="solution-title">🔧 Solution 2: Installation Certificat</div>
+            <p>Installez le certificat dans le store Windows pour qu'il soit reconnu:</p>
+            <button onclick="showCertInstallInstructions()">Instructions Installation</button>
+            <button onclick="downloadCertScript()">Télécharger Script</button>
+        </div>
+
+        <div class="solution-card">
+            <div class="solution-title">🌐 Solution 3: Navigateur Spécial</div>
+            <p>Lancez Chrome avec des flags spéciaux pour ignorer les erreurs SSL:</p>
+            <button onclick="showChromeFlags()">Flags Chrome</button>
+            <button onclick="createChromeShortcut()">Créer Raccourci</button>
+        </div>
+
+        <div class="solution-card">
+            <div class="solution-title">🔄 Solution 4: Port HTTP</div>
+            <p>Configurez temporairement un port HTTP (non sécurisé) pour les tests:</p>
+            <button onclick="showHttpConfig()">Configuration HTTP</button>
+            <span class="badge badge-warning">Développement uniquement</span>
+        </div>
+
+        <div id="results"></div>
+
+        <h2>🧪 Tests de Connectivité</h2>
+        <button onclick="testStatus()">Test Status API</button>
+        <button onclick="testReaders()">Test Lecteurs</button>
+        <button onclick="testDiagnostic()">Test Diagnostic</button>
+        
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+        const testResultsDiv = document.getElementById('testResults');
+        
+        function showResult(title, content, type = 'info', targetDiv = resultsDiv) {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${title}</strong><br><pre>${typeof content === 'string' ? content : JSON.stringify(content, null, 2)}</pre>`;
+            targetDiv.appendChild(div);
+        }
+        
+        function showLoading(message, targetDiv = resultsDiv) {
+            const div = document.createElement('div');
+            div.className = 'status info';
+            div.innerHTML = `<div class="loading"></div> ${message}`;
+            targetDiv.appendChild(div);
+            return div;
+        }
+
+        async function testWithFetch() {
+            const loading = showLoading('Test fetch simple...');
+            
+            try {
+                // Test avec mode no-cors pour éviter les erreurs SSL
+                const response = await fetch('https://localhost:8443/api/status', {
+                    mode: 'no-cors'
+                });
+                
+                loading.remove();
+                showResult('✅ Fetch Test', 'Connexion établie (mode no-cors)', 'success');
+                
+                // Maintenant essayer en mode normal
+                setTimeout(async () => {
+                    try {
+                        const normalResponse = await fetch('https://localhost:8443/api/status');
+                        const data = await normalResponse.json();
+                        showResult('✅ API Accessible', data, 'success');
+                    } catch (error) {
+                        showResult('⚠️ SSL Bloqué', 'Connexion possible mais SSL bloqué', 'warning');
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                loading.remove();
+                showResult('❌ Connexion Impossible', error.message, 'error');
+            }
+        }
+
+        function testWithJsonp() {
+            showResult('💡 JSONP Alternative', 
+                'JSONP ne fonctionne pas avec HTTPS/SSL.\nUtilisez plutôt les autres solutions.', 
+                'info'
+            );
+        }
+
+        function showCurlCommand() {
+            showResult('💻 Commande CURL', 
+                'curl -k https://localhost:8443/api/status\n\n' +
+                'Le flag -k ignore les erreurs de certificat SSL.\n' +
+                'Si cette commande fonctionne, le problème est uniquement côté navigateur.',
+                'info'
+            );
+        }
+
+        function showCertInstallInstructions() {
+            showResult('📋 Installation Certificat', 
+                '1. Exécutez create-trusted-cert.bat en tant qu\'administrateur\n' +
+                '2. Ou exécutez fix-ssl-complete.bat\n' +
+                '3. Redémarrez votre navigateur\n' +
+                '4. Le certificat sera reconnu automatiquement\n\n' +
+                'Alternative manuelle:\n' +
+                '1. Ouvrez https://localhost:8443/\n' +
+                '2. Cliquez sur l\'icône de cadenas\n' +
+                '3. Exportez le certificat\n' +
+                '4. Installez-le dans "Autorités de certification racines de confiance"',
+                'info'
+            );
+        }
+
+        function downloadCertScript() {
+            const script = `@echo off
+echo Installation du certificat eID Bridge...
+powershell -Command "& {
+    $certPath = 'C:\\ProgramData\\OphtalmoPro\\eID-Bridge\\Certificates\\bridge-cert.pfx'
+    $password = 'OphtalmoPro2024!'
+    if (Test-Path $certPath) {
+        $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPath, $password)
+        $store = New-Object System.Security.Cryptography.X509Certificates.X509Store('Root', 'CurrentUser')
+        $store.Open('ReadWrite')
+        $store.Add($cert)
+        $store.Close()
+        Write-Host 'Certificat installé avec succès'
+    }
+}"
+pause`;
+            
+            const blob = new Blob([script], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'install-cert.bat';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showResult('📥 Script Téléchargé', 'install-cert.bat téléchargé. Exécutez-le en tant qu\'administrateur.', 'success');
+        }
+
+        function showChromeFlags() {
+            const flags = '--ignore-certificate-errors-spki-list --ignore-certificate-errors --ignore-ssl-errors --allow-running-insecure-content --disable-web-security --user-data-dir=%TEMP%\\chrome-dev';
+            
+            showResult('🚀 Flags Chrome', 
+                `chrome.exe ${flags} https://localhost:8443/\n\n` +
+                'Ces flags désactivent les vérifications SSL pour le développement.\n' +
+                'ATTENTION: N\'utilisez ces flags que pour le développement !',
+                'warning'
+            );
+        }
+
+        function createChromeShortcut() {
+            showResult('🔗 Raccourci Chrome', 
+                'Exécutez fix-ssl-complete.bat pour créer automatiquement\n' +
+                'un raccourci Chrome spécial sur votre bureau.\n\n' +
+                'Le raccourci "Chrome-eID-Dev.lnk" ignorera les erreurs SSL.',
+                'info'
+            );
+        }
+
+        function showHttpConfig() {
+            showResult('⚠️ Configuration HTTP', 
+                'Pour configurer un port HTTP temporaire:\n\n' +
+                '1. Modifiez launchSettings.json:\n' +
+                '   "applicationUrl": "http://localhost:8080"\n\n' +
+                '2. Ou ajoutez une variable d\'environnement:\n' +
+                '   ASPNETCORE_URLS=http://localhost:8080\n\n' +
+                'ATTENTION: HTTP n\'est pas sécurisé, utilisez uniquement pour les tests !',
+                'warning'
+            );
+        }
+
+        // Tests de connectivité
+        async function testStatus() {
+            const loading = showLoading('Test du status...', testResultsDiv);
+            try {
+                const response = await fetch('https://localhost:8443/api/status');
+                const data = await response.json();
+                loading.remove();
+                showResult('✅ Status API', data, 'success', testResultsDiv);
+            } catch (error) {
+                loading.remove();
+                if (error.message.includes('Failed to fetch')) {
+                    showResult('❌ SSL Bloqué', 'Utilisez une des solutions ci-dessus', 'error', testResultsDiv);
+                } else {
+                    showResult('❌ Erreur', error.message, 'error', testResultsDiv);
+                }
+            }
+        }
+
+        async function testReaders() {
+            const loading = showLoading('Test des lecteurs...', testResultsDiv);
+            try {
+                const response = await fetch('https://localhost:8443/api/readers');
+                const data = await response.json();
+                loading.remove();
+                showResult('✅ Lecteurs', data, 'success', testResultsDiv);
+            } catch (error) {
+                loading.remove();
+                showResult('❌ Erreur Lecteurs', error.message, 'error', testResultsDiv);
+            }
+        }
+
+        async function testDiagnostic() {
+            const loading = showLoading('Diagnostic système...', testResultsDiv);
+            try {
+                const response = await fetch('https://localhost:8443/api/diagnostic');
+                const data = await response.json();
+                loading.remove();
+                showResult('✅ Diagnostic', data, 'success', testResultsDiv);
+            } catch (error) {
+                loading.remove();
+                showResult('❌ Erreur Diagnostic', error.message, 'error', testResultsDiv);
+            }
+        }
+
+        // Test automatique au chargement
+        window.onload = function() {
+            showResult('ℹ️ Information', 
+                'Cette page propose plusieurs solutions pour résoudre le problème SSL.\n' +
+                'Commencez par tester avec CURL pour vérifier que l\'API fonctionne.',
+                'info'
+            );
+        };
+    </script>
+</body>
+</html>
