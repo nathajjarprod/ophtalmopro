@@ -304,17 +304,14 @@ namespace OphtalmoPro.EidBridge
                         // Utiliser le port détecté dynamiquement
                         var port = int.Parse(Environment.GetEnvironmentVariable("SELECTED_PORT") ?? "8443");
                         
-                        // Port HTTPS sécurisé
+                        // Configuration port unique HTTPS
                         options.ListenLocalhost(port, listenOptions =>
                         {
                             listenOptions.UseHttps(GetOrCreateCertificate());
                         });
                         
-                        // Configuration des protocoles
-                        options.ConfigureEndpointDefaults(endpointOptions =>
-                        {
-                            endpointOptions.Protocols = HttpProtocols.Http1AndHttp2;
-                        });
+                        // Désactiver les autres endpoints par défaut
+                        options.ConfigureEndpointDefaults(lo => lo.Protocols = HttpProtocols.Http1AndHttp2);
                     });
                 })
                 .ConfigureLogging(logging =>

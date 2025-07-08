@@ -31,10 +31,6 @@ namespace OphtalmoPro.EidBridge
 
             // Services principaux
             services.AddControllers();
-            services.AddHttpsRedirection(options =>
-            {
-                options.HttpsPort = 8443;
-            });
 
             // Services métier
             services.AddScoped<IEidMiddlewareService, EidMiddlewareService>();
