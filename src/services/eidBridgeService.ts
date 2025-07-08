@@ -42,7 +42,7 @@ export interface EidBridgeResponse<T> {
 }
 
 class EidBridgeService {
-  private readonly bridgeUrl = 'https://localhost:8443/api';
+  private readonly bridgeUrl = 'https://localhost:9597/api';
   private readonly timeout = 30000; // 30 secondes
   private token: string | null = null;
   private tokenExpiry: number = 0;
@@ -331,7 +331,7 @@ L'application eID Bridge Windows est requise pour lire les cartes eID.
 ✅ VÉRIFICATION:
 1. Ouvrez services.msc
 2. Vérifiez que "OphtalmoPro eID Bridge" est démarré
-3. Testez avec https://localhost:8443/ dans votre navigateur
+3. Testez avec https://localhost:9597/ dans votre navigateur
 
 🔧 DÉPANNAGE:
 - Exécutez test-connection.bat pour diagnostiquer

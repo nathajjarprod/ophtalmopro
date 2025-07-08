@@ -295,7 +295,7 @@ const EidBridgeSetup: React.FC = () => {
       <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
         <div className="flex items-center space-x-4">
           <a
-            href="https://localhost:8443/"
+            href="https://localhost:9597/"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center space-x-1 text-blue-600 hover:text-blue-800"
@@ -305,7 +305,7 @@ const EidBridgeSetup: React.FC = () => {
           </a>
           
           <a
-            href="https://localhost:8443/api-docs"
+            href="https://localhost:9597/api-docs"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center space-x-1 text-blue-600 hover:text-blue-800"

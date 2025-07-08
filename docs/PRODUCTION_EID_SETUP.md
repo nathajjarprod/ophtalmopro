@@ -25,7 +25,7 @@
 <!-- Configuration Windows Service -->
 <service>
   <name>Belgium eID Middleware</name>
-  <port>53001</port>
+  <port>9597</port>
   <autostart>true</autostart>
   <security>localhost-only</security>
 </service>
