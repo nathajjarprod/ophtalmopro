@@ -17,6 +17,8 @@ namespace OphtalmoPro.EidBridge
         
         public static void Main(string[] args)
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            
             // Configuration des logs
             var logPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
@@ -43,6 +45,15 @@ namespace OphtalmoPro.EidBridge
                 _selectedPort = FindAvailablePort(9597);
                 Console.WriteLine($"🌐 Port sélectionné: {_selectedPort}");
                 
+                // Attendre un peu pour s'assurer que le port est vraiment libre
+                Console.WriteLine("⏳ Vérification finale du port...");
+                System.Threading.Thread.Sleep(1000);
+                
+                if (!IsPortAvailable(_selectedPort))
+                {
+                    throw new InvalidOperationException($"Le port {_selectedPort} est devenu indisponible");
+                }
+                
                 // Stocker le port sélectionné pour Kestrel
                 Environment.SetEnvironmentVariable("SELECTED_PORT", _selectedPort.ToString());
                 
@@ -65,7 +76,7 @@ namespace OphtalmoPro.EidBridge
                 Console.WriteLine($"❌ Erreur au démarrage: {ex.Message}");
                 Console.WriteLine("Appuyez sur une touche pour continuer...");
                 Console.ReadKey();
-                throw;
+                Environment.Exit(1);
             }
         }
 
@@ -105,8 +116,10 @@ namespace OphtalmoPro.EidBridge
 
         private static bool IsPortAvailable(int port)
         {
+            // Test multiple pour s'assurer que le port est vraiment libre
             try
             {
+                // Test 1: Vérifier avec IPGlobalProperties
                 var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
                 var tcpConnInfoArray = ipGlobalProperties.GetActiveTcpListeners();
 
@@ -118,14 +131,33 @@ namespace OphtalmoPro.EidBridge
                     }
                 }
 
-                // Test supplémentaire avec TcpListener
+                // Test 2: Essayer de créer un TcpListener
                 var listener = new System.Net.Sockets.TcpListener(IPAddress.Loopback, port);
                 listener.Start();
+                
+                // Test 3: Attendre un peu et vérifier à nouveau
+                System.Threading.Thread.Sleep(100);
+                
                 listener.Stop();
+                
+                // Test 4: Vérifier qu'aucun processus n'utilise le port après fermeture
+                System.Threading.Thread.Sleep(100);
+                
+                var tcpConnInfoArray2 = ipGlobalProperties.GetActiveTcpListeners();
+                foreach (var endpoint in tcpConnInfoArray2)
+                {
+                    if (endpoint.Port == port)
+                    {
+                        Console.WriteLine($"⚠️ Port {port} encore en cours d'utilisation après test");
+                        return false;
+                    }
+                }
+                
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"❌ Erreur lors du test du port {port}: {ex.Message}");
                 return false;
             }
         }

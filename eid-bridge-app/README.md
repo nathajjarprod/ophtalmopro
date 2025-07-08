@@ -155,6 +155,30 @@ const readEidCard = async () => {
 
 ## 🔍 Dépannage
 
+### Problème de Port "Address already in use"
+
+Si vous obtenez l'erreur "Failed to bind to address", suivez ces étapes :
+
+1. **Nettoyage rapide** :
+   ```cmd
+   force-kill-ports.bat
+   ```
+
+2. **Diagnostic complet** :
+   ```cmd
+   diagnose-port-issue.bat
+   ```
+
+3. **Nettoyage nucléaire** (si le problème persiste) :
+   ```cmd
+   nuclear-cleanup.bat
+   ```
+
+4. **Démarrage sécurisé** :
+   ```cmd
+   safe-start.bat
+   ```
+
 ### Problèmes Courants
 
 #### "Service non démarré"
