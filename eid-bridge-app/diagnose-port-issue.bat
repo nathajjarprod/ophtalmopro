@@ -6,10 +6,10 @@ echo.
 
 setlocal enabledelayedexpansion
 
-echo [1/6] Vérification des ports 9597-9604...
+echo [1/6] Vérification des ports 8443-8450...
 echo.
 
-for /L %%i in (9597,1,9604) do (
+for /L %%i in (8443,1,8450) do (
     echo === PORT %%i ===
     
     REM Vérifier si le port est en écoute
@@ -60,10 +60,10 @@ echo.
 
 echo [4/6] Vérification des réservations d'URL...
 echo.
-netsh http show urlacl | findstr "9597\|9598\|9599\|9600" >nul 2>&1
+netsh http show urlacl | findstr "8443\|8444\|8445\|8446" >nul 2>&1
 if !errorLevel! equ 0 (
     echo Réservations d'URL trouvées:
-    netsh http show urlacl | findstr "9597\|9598\|9599\|9600"
+    netsh http show urlacl | findstr "8443\|8444\|8445\|8446"
 ) else (
     echo ✅ Aucune réservation d'URL sur ces ports
 )
@@ -71,7 +71,7 @@ echo.
 
 echo [5/6] Test de liaison directe...
 echo.
-for /L %%i in (9597,1,9600) do (
+for /L %%i in (8443,1,8446) do (
     echo Test de liaison sur port %%i...
     
     REM Créer un script PowerShell temporaire pour tester la liaison

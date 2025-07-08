@@ -77,7 +77,7 @@ netsh advfirewall firewall add rule ^
     dir=in ^
     action=allow ^
     protocol=TCP ^
-    localport=9597 ^
+    localport=8443 ^
     profile=private,domain ^
     description="API HTTPS pour OphtalmoPro eID Bridge"
 
@@ -98,14 +98,13 @@ if %errorLevel% neq 0 (
     echo Service: OphtalmoPro eID Bridge
     echo Statut: Démarré
     echo API: https://localhost:8443/
-    echo API: https://localhost:9597/
     echo Logs: C:\ProgramData\OphtalmoPro\eID-Bridge\Logs\
     echo.
     echo Test de connectivité...
     timeout /t 3 /nobreak >nul
     
     REM Test de connectivité
-    curl -k https://localhost:9597/api/status >nul 2>&1
+    curl -k https://localhost:8443/api/status >nul 2>&1
     if %errorLevel% equ 0 (
         echo ✅ Service opérationnel !
         echo.

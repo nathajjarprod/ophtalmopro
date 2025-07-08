@@ -42,7 +42,7 @@ export interface EidBridgeResponse<T> {
 }
 
 class EidBridgeService {
-  private readonly bridgeUrl = 'https://localhost:9597/api';
+  private readonly bridgeUrl = 'https://localhost:8443/api';
   private readonly timeout = 30000; // 30 secondes
   private token: string | null = null;
   private tokenExpiry: number = 0;

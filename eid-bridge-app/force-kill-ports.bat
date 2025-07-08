@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo Libération forcée des ports 9597-9604
+echo Libération forcée des ports 8443-8450
 echo ========================================
 echo.
 
@@ -12,9 +12,9 @@ taskkill /F /IM "OphtalmoPro.EidBridge.exe" >nul 2>&1
 echo ✅ Processus .NET arrêtés
 
 echo.
-echo [2/4] Libération des ports spécifiques...
+echo [2/4] Libération du port principal 8443...
 
-for /L %%i in (9597,1,9604) do (
+for /L %%i in (8443,1,8450) do (
     echo Libération du port %%i...
     
     REM Trouver le PID qui utilise le port
@@ -57,7 +57,7 @@ echo.
 
 REM Vérification finale
 echo Vérification finale des ports...
-for /L %%i in (9597,1,9604) do (
+for /L %%i in (8443,1,8450) do (
     netstat -an | findstr ":%%i " >nul 2>&1
     if !errorLevel! equ 0 (
         echo ❌ Port %%i encore utilisé

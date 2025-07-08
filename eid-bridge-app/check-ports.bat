@@ -7,7 +7,7 @@ echo.
 echo [1/2] Ports en écoute sur localhost...
 echo.
 
-for /L %%i in (9597,1,9604) do (
+for /L %%i in (8443,1,8450) do (
     echo Vérification du port %%i...
     netstat -an | findstr ":%%i " >nul 2>&1
     if !errorLevel! equ 0 (
@@ -29,11 +29,11 @@ for /L %%i in (9597,1,9604) do (
 echo [2/2] Test de connectivité API...
 echo.
 
-for /L %%i in (9597,1,9604) do (
+for /L %%i in (8443,1,8450) do (
     echo Test HTTPS sur port %%i...
     curl -k -s --connect-timeout 2 https://localhost:%%i/api/status >nul 2>&1
     if !errorLevel! equ 0 (
-        echo ✅ API OphtalmoPro eID Bridge active sur port %%i
+        echo ✅ API eID Bridge active sur port %%i
         curl -k -s https://localhost:%%i/api/status
         echo.
     ) else (

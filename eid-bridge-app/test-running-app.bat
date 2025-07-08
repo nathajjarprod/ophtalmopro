@@ -7,26 +7,13 @@ echo.
 echo L'application est maintenant opérationnelle !
 echo.
 echo Ports d'écoute détectés:
-echo ✅ https://localhost:9597 (principal)
-echo ✅ https://localhost:8443 (secondaire)
+echo ✅ https://localhost:8443 (principal)
 echo.
 
 echo [1/3] Test de connectivité API...
 echo.
 
-REM Test du port principal
-echo Test du port 9597...
-curl -k -s https://localhost:9597/api/status >nul 2>&1
-if %errorLevel% equ 0 (
-    echo ✅ Port 9597 - API accessible
-    curl -k -s https://localhost:9597/api/status
-    echo.
-) else (
-    echo ❌ Port 9597 - API non accessible
-)
-
-echo.
-REM Test du port secondaire
+REM Test du port principal 8443
 echo Test du port 8443...
 curl -k -s https://localhost:8443/api/status >nul 2>&1
 if %errorLevel% equ 0 (
@@ -41,8 +28,6 @@ echo.
 echo [2/3] Test de l'interface web...
 echo.
 echo Ouverture de l'interface dans le navigateur...
-start https://localhost:9597/
-timeout /t 2 /nobreak >nul
 start https://localhost:8443/
 
 echo.
@@ -53,15 +38,14 @@ echo 🏥 APPLICATION eID BRIDGE OPÉRATIONNELLE
 echo ========================================
 echo.
 echo 📡 URLs d'accès:
-echo    • Interface: https://localhost:9597/
 echo    • Interface: https://localhost:8443/
-echo    • API Status: https://localhost:9597/api/status
-echo    • API Lecteurs: https://localhost:9597/api/readers
-echo    • API Lecture: https://localhost:9597/api/read-card
+echo    • API Status: https://localhost:8443/api/status
+echo    • API Lecteurs: https://localhost:8443/api/readers
+echo    • API Lecture: https://localhost:8443/api/read-card
 echo.
 echo 🔧 Pour tester depuis votre application web:
 echo.
-echo fetch('https://localhost:9597/api/status')
+echo fetch('https://localhost:8443/api/status')
 echo   .then(r =^> r.json())
 echo   .then(console.log);
 echo.
