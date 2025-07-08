@@ -37,7 +37,7 @@ namespace OphtalmoPro.EidBridge
             });
 
             // Services métier
-            services.AddSingleton<IEidMiddlewareService, EidMiddlewareService>();
+            services.AddScoped<IEidMiddlewareService, EidMiddlewareService>();
             services.AddSingleton<ICardReaderService, CardReaderService>();
             services.AddSingleton<ISecurityService, SecurityService>();
             services.AddSingleton<IAuditService, AuditService>();

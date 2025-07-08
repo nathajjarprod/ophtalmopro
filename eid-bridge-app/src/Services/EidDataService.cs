@@ -46,7 +46,7 @@ namespace OphtalmoPro.EidBridge.Services
                 var identity = await ReadIdentityAsync();
                 
                 // Lire l'adresse si demandée
-                EidAddress address = null;
+                EidAddress? address = null;
                 if (options.IncludeAddress)
                 {
                     try
@@ -60,7 +60,7 @@ namespace OphtalmoPro.EidBridge.Services
                 }
 
                 // Lire la photo si demandée
-                string photo = null;
+                string? photo = null;
                 if (options.IncludePhoto)
                 {
                     try
@@ -84,7 +84,7 @@ namespace OphtalmoPro.EidBridge.Services
                     CardNumber = identity.CardNumber,
                     ValidityBeginDate = FormatDate(identity.ValidityBeginDate),
                     ValidityEndDate = FormatDate(identity.ValidityEndDate),
-                    Address = address,
+                    Address = address ?? new EidAddress { Street = "", PostalCode = "", City = "", Country = "Belgique" },
                     Photo = photo
                 };
 
@@ -180,7 +180,7 @@ namespace OphtalmoPro.EidBridge.Services
             throw new MiddlewareException("Impossible de lire les données d'identité");
         }
 
-        private async Task<EidAddress> ReadAddressAsync()
+        private async Task<EidAddress?> ReadAddressAsync()
         {
             var endpoints = new[] { "/address", "/addr", "/card/address" };
             
@@ -196,9 +196,9 @@ namespace OphtalmoPro.EidBridge.Services
                         
                         return new EidAddress
                         {
-                            Street = GetJsonValue(rawData, "street_and_number", "street", "rue"),
-                            PostalCode = GetJsonValue(rawData, "zip_code", "postalCode", "postal_code"),
-                            City = GetJsonValue(rawData, "municipality", "city", "ville"),
+                            Street = GetJsonValue(rawData, "street_and_number", "street", "rue") ?? "",
+                            PostalCode = GetJsonValue(rawData, "zip_code", "postalCode", "postal_code") ?? "",
+                            City = GetJsonValue(rawData, "municipality", "city", "ville") ?? "",
                             Country = GetJsonValue(rawData, "country") ?? "Belgique"
                         };
                     }
@@ -212,7 +212,7 @@ namespace OphtalmoPro.EidBridge.Services
             return null; // L'adresse n'est pas critique
         }
 
-        private async Task<string> ReadPhotoAsync()
+        private async Task<string?> ReadPhotoAsync()
         {
             var endpoints = new[] { "/photo", "/image", "/card/photo" };
             
@@ -279,7 +279,7 @@ namespace OphtalmoPro.EidBridge.Services
             return diagnostic;
         }
 
-        private string GetJsonValue(JsonElement element, params string[] propertyNames)
+        private string? GetJsonValue(JsonElement element, params string[] propertyNames)
         {
             foreach (var propertyName in propertyNames)
             {
@@ -338,26 +338,26 @@ namespace OphtalmoPro.EidBridge.Services
     // Classes de données internes
     internal class IdentityData
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string DateOfBirth { get; set; }
-        public string PlaceOfBirth { get; set; }
-        public string Nationality { get; set; }
-        public string Niss { get; set; }
-        public string CardNumber { get; set; }
-        public string ValidityBeginDate { get; set; }
-        public string ValidityEndDate { get; set; }
+        public string FirstName { get; set; } = "";
+        public string LastName { get; set; } = "";
+        public string DateOfBirth { get; set; } = "";
+        public string PlaceOfBirth { get; set; } = "";
+        public string Nationality { get; set; } = "";
+        public string Niss { get; set; } = "";
+        public string CardNumber { get; set; } = "";
+        public string ValidityBeginDate { get; set; } = "";
+        public string ValidityEndDate { get; set; } = "";
     }
 
     // Exceptions personnalisées
     public class MiddlewareException : Exception
-    public string FirstName { get; set; } = "";
-    public string LastName { get; set; } = "";
-    public string DateOfBirth { get; set; } = "";
-    public string PlaceOfBirth { get; set; } = "";
-    public string Nationality { get; set; } = "";
-    public string Niss { get; set; } = "";
-    public string CardNumber { get; set; } = "";
-    public string ValidityBeginDate { get; set; } = "";
-    public string ValidityEndDate { get; set; } = "";
+    {
+        public MiddlewareException(string message) : base(message) { }
+        public MiddlewareException(string message, Exception innerException) : base(message, innerException) { }
+    }
+
+    public class CardNotPresentException : Exception
+    {
+        public CardNotPresentException(string message) : base(message) { }
+    }
 }
