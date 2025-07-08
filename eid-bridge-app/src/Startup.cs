@@ -49,11 +49,14 @@ namespace OphtalmoPro.EidBridge
                             "https://localhost:5173",
                             "https://localhost:3000",
                             "https://127.0.0.1:5173",
-                            "https://127.0.0.1:3000"
+                            "https://127.0.0.1:3000",
+                            "https://localhost:8443",
+                            "https://127.0.0.1:8443"
                         )
                         .AllowAnyMethod()
                         .AllowAnyHeader()
-                        .AllowCredentials();
+                        .AllowCredentials()
+                        .SetIsOriginAllowedToAllowWildcardSubdomains();
                 });
             });
 
