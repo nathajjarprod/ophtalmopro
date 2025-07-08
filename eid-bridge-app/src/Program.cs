@@ -97,7 +97,7 @@ namespace OphtalmoPro.EidBridge
             // Diagnostic du port occupé
             DiagnosePortUsage(preferredPort);
             
-            // Tenter de libérer le port
+            // Tenter de libérer le port si possible
             if (TryFreePort(preferredPort))
             {
                 System.Threading.Thread.Sleep(1000);
@@ -149,28 +149,31 @@ namespace OphtalmoPro.EidBridge
                 
                 using (var process = System.Diagnostics.Process.Start(processInfo))
                 {
-                    var output = process.StandardOutput.ReadToEnd();
-                    var lines = output.Split('\n');
-                    
-                    foreach (var line in lines)
+                    if (process != null)
                     {
-                        if (line.Contains($":{port} "))
+                        var output = process.StandardOutput.ReadToEnd();
+                        var lines = output.Split('\n');
+                        
+                        foreach (var line in lines)
                         {
-                            Console.WriteLine($"   Port utilisé: {line.Trim()}");
-                            
-                            // Extraire le PID
-                            var parts = line.Trim().Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
-                            if (parts.Length > 4)
+                            if (line.Contains($":{port} "))
                             {
-                                var pid = parts[4];
-                                try
+                                Console.WriteLine($"   Port utilisé: {line.Trim()}");
+                                
+                                // Extraire le PID
+                                var parts = line.Trim().Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+                                if (parts.Length > 4)
                                 {
-                                    var proc = System.Diagnostics.Process.GetProcessById(int.Parse(pid));
-                                    Console.WriteLine($"   Processus: {proc.ProcessName} (PID: {pid})");
-                                }
-                                catch
-                                {
-                                    Console.WriteLine($"   PID: {pid} (processus non accessible)");
+                                    var pid = parts[4];
+                                    try
+                                    {
+                                        var proc = System.Diagnostics.Process.GetProcessById(int.Parse(pid));
+                                        Console.WriteLine($"   Processus: {proc.ProcessName} (PID: {pid})");
+                                    }
+                                    catch
+                                    {
+                                        Console.WriteLine($"   PID: {pid} (processus non accessible)");
+                                    }
                                 }
                             }
                         }
@@ -232,6 +235,7 @@ namespace OphtalmoPro.EidBridge
                 return false;
             }
         }
+
         private static bool IsPortAvailable(int port)
         {
             // Test multiple et plus robuste pour s'assurer que le port est vraiment libre
@@ -301,14 +305,11 @@ namespace OphtalmoPro.EidBridge
                     // Configuration HTTPS avec certificat auto-généré
                     webBuilder.ConfigureKestrel(options =>
                     {
-                        // Désactiver tous les endpoints par défaut
-                        options.ConfigureEndpointDefaults(lo => lo.Reset());
-                        
                         // Utiliser le port détecté dynamiquement
                         var port = int.Parse(Environment.GetEnvironmentVariable("SELECTED_PORT") ?? "8443");
                         
                         // Configuration port unique HTTPS seulement
-                        options.Listen(System.Net.IPAddress.Loopback, port, listenOptions =>
+                        options.ListenLocalhost(port, listenOptions =>
                         {
                             listenOptions.UseHttps(GetOrCreateCertificate());
                             listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
