@@ -47,7 +47,7 @@ Cette application Windows se charge de :
 - Test de connectivité avec le middleware eID
 
 ### 2. Paramètres Réseau
-- **Port API** : 8443 (HTTPS) par défaut
+- **Port API** : 9597 (HTTPS) par défaut
 - **Certificat SSL** : Auto-généré ou personnalisé
 - **Accès** : Localhost uniquement (sécurité)
 
@@ -113,7 +113,7 @@ Cette application Windows se charge de :
 // Dans votre application web
 const readEidCard = async () => {
   try {
-    const response = await fetch('https://localhost:8443/api/read-card', {
+    const response = await fetch('https://localhost:9597/api/read-card', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -192,10 +192,10 @@ net stop "OphtalmoPro eID Bridge"
 net start "OphtalmoPro eID Bridge"
 
 # Vérifier le port
-netstat -an | findstr :8443
+netstat -an | findstr :9597
 
 # Test de connectivité
-curl -k https://localhost:8443/api/status
+curl -k https://localhost:9597/api/status
 ```
 
 ## 📊 Monitoring
