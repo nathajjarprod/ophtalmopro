@@ -178,27 +178,44 @@ Si vous obtenez l'erreur "Le chemin d'accès spécifié est introuvable" :
 
 ### Problème de Port "Address already in use"
 
-Si vous obtenez l'erreur "Failed to bind to address", suivez ces étapes :
+Si vous obtenez l'erreur "Failed to bind to address", suivez ces étapes dans l'ordre :
 
-1. **Nettoyage rapide** :
+1. **Solution ultime** (recommandée) :
+   ```cmd
+   ultimate-port-fix.bat
+   ```
+
+2. **Nettoyage rapide** :
    ```cmd
    force-kill-ports.bat
    ```
 
-2. **Diagnostic complet** :
+3. **Diagnostic complet** :
    ```cmd
    diagnose-port-issue.bat
    ```
 
-3. **Nettoyage nucléaire** (si le problème persiste) :
+4. **Nettoyage nucléaire** (si le problème persiste) :
    ```cmd
    nuclear-cleanup.bat
    ```
 
-4. **Démarrage sécurisé** :
+5. **Démarrage sécurisé** :
    ```cmd
    safe-start.bat
    ```
+
+6. **Démarrage d'urgence** (port automatique) :
+   ```cmd
+   emergency-start.bat
+   ```
+
+### Solutions par ordre de priorité
+
+1. **ultimate-port-fix.bat** - Solution la plus complète
+2. **emergency-start.bat** - Utilise un port libre automatiquement
+3. **Redémarrage de l'ordinateur** - Solution radicale mais efficace
+4. **Changement de port** - Modifier le port dans appsettings.json
 
 ### Problèmes Courants
 

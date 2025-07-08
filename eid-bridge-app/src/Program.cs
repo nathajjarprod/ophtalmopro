@@ -82,6 +82,9 @@ namespace OphtalmoPro.EidBridge
 
         private static int FindAvailablePort(int preferredPort)
         {
+            // Attendre un peu au cas où un processus serait en train de se fermer
+            System.Threading.Thread.Sleep(2000);
+            
             // Tester le port préféré d'abord
             if (IsPortAvailable(preferredPort))
             {
@@ -91,8 +94,22 @@ namespace OphtalmoPro.EidBridge
 
             Console.WriteLine($"⚠️ Port {preferredPort} déjà utilisé, recherche d'un port alternatif...");
 
-            // Tester des ports alternatifs
-            var alternativePorts = new[] { 9598, 9599, 9600, 9601, 9602, 9603, 9604 };
+            // Diagnostic du port occupé
+            DiagnosePortUsage(preferredPort);
+            
+            // Tenter de libérer le port
+            if (TryFreePort(preferredPort))
+            {
+                System.Threading.Thread.Sleep(1000);
+                if (IsPortAvailable(preferredPort))
+                {
+                    Console.WriteLine($"✅ Port {preferredPort} libéré avec succès");
+                    return preferredPort;
+                }
+            }
+            
+            // Tester des ports alternatifs dans une plage plus large
+            var alternativePorts = new[] { 9598, 9599, 9600, 9601, 9602, 9603, 9604, 9605, 9606, 9607, 9608, 9609, 9610 };
             
             foreach (var port in alternativePorts)
             {
@@ -114,12 +131,113 @@ namespace OphtalmoPro.EidBridge
             return dynamicPort;
         }
 
-        private static bool IsPortAvailable(int port)
+        private static void DiagnosePortUsage(int port)
         {
-            // Test multiple pour s'assurer que le port est vraiment libre
             try
             {
-                // Test 1: Vérifier avec IPGlobalProperties
+                Console.WriteLine($"🔍 Diagnostic du port {port}...");
+                
+                // Utiliser netstat pour trouver qui utilise le port
+                var processInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "netstat",
+                    Arguments = "-ano",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                
+                using (var process = System.Diagnostics.Process.Start(processInfo))
+                {
+                    var output = process.StandardOutput.ReadToEnd();
+                    var lines = output.Split('\n');
+                    
+                    foreach (var line in lines)
+                    {
+                        if (line.Contains($":{port} "))
+                        {
+                            Console.WriteLine($"   Port utilisé: {line.Trim()}");
+                            
+                            // Extraire le PID
+                            var parts = line.Trim().Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+                            if (parts.Length > 4)
+                            {
+                                var pid = parts[4];
+                                try
+                                {
+                                    var proc = System.Diagnostics.Process.GetProcessById(int.Parse(pid));
+                                    Console.WriteLine($"   Processus: {proc.ProcessName} (PID: {pid})");
+                                }
+                                catch
+                                {
+                                    Console.WriteLine($"   PID: {pid} (processus non accessible)");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"   Erreur diagnostic: {ex.Message}");
+            }
+        }
+        
+        private static bool TryFreePort(int port)
+        {
+            try
+            {
+                Console.WriteLine($"🔧 Tentative de libération du port {port}...");
+                
+                // Méthode 1: Tuer les processus dotnet
+                var dotnetProcesses = System.Diagnostics.Process.GetProcessesByName("dotnet");
+                foreach (var proc in dotnetProcesses)
+                {
+                    try
+                    {
+                        Console.WriteLine($"   Arrêt du processus dotnet PID: {proc.Id}");
+                        proc.Kill();
+                        proc.WaitForExit(2000);
+                    }
+                    catch
+                    {
+                        // Ignorer les erreurs
+                    }
+                }
+                
+                // Méthode 2: Tuer les processus OphtalmoPro
+                var ophtalmoProcesses = System.Diagnostics.Process.GetProcessesByName("OphtalmoPro.EidBridge");
+                foreach (var proc in ophtalmoProcesses)
+                {
+                    try
+                    {
+                        Console.WriteLine($"   Arrêt du processus OphtalmoPro PID: {proc.Id}");
+                        proc.Kill();
+                        proc.WaitForExit(2000);
+                    }
+                    catch
+                    {
+                        // Ignorer les erreurs
+                    }
+                }
+                
+                // Attendre un peu
+                System.Threading.Thread.Sleep(1000);
+                
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"   Erreur libération: {ex.Message}");
+                return false;
+            }
+        }
+        private static bool IsPortAvailable(int port)
+        {
+            // Test multiple et plus robuste pour s'assurer que le port est vraiment libre
+            try
+            {
+                // Test 1: Vérifier avec IPGlobalProperties (listeners actifs)
                 var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
                 var tcpConnInfoArray = ipGlobalProperties.GetActiveTcpListeners();
 
@@ -131,17 +249,28 @@ namespace OphtalmoPro.EidBridge
                     }
                 }
 
-                // Test 2: Essayer de créer un TcpListener
+                // Test 2: Vérifier les connexions TCP actives
+                var tcpConnections = ipGlobalProperties.GetActiveTcpConnections();
+                foreach (var connection in tcpConnections)
+                {
+                    if (connection.LocalEndPoint.Port == port)
+                    {
+                        Console.WriteLine($"   Port {port} utilisé par une connexion active: {connection.State}");
+                        return false;
+                    }
+                }
+
+                // Test 3: Essayer de créer un TcpListener
                 var listener = new System.Net.Sockets.TcpListener(IPAddress.Loopback, port);
                 listener.Start();
                 
-                // Test 3: Attendre un peu et vérifier à nouveau
-                System.Threading.Thread.Sleep(100);
+                // Test 4: Attendre un peu et vérifier à nouveau
+                System.Threading.Thread.Sleep(200);
                 
                 listener.Stop();
                 
-                // Test 4: Vérifier qu'aucun processus n'utilise le port après fermeture
-                System.Threading.Thread.Sleep(100);
+                // Test 5: Vérifier qu'aucun processus n'utilise le port après fermeture
+                System.Threading.Thread.Sleep(200);
                 
                 var tcpConnInfoArray2 = ipGlobalProperties.GetActiveTcpListeners();
                 foreach (var endpoint in tcpConnInfoArray2)
@@ -157,7 +286,7 @@ namespace OphtalmoPro.EidBridge
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Erreur lors du test du port {port}: {ex.Message}");
+                Console.WriteLine($"   Erreur test port {port}: {ex.Message}");
                 return false;
             }
         }
