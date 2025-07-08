@@ -29,11 +29,11 @@ echo.
 echo [2/5] Test de connectivité réseau...
 
 REM Vérifier si le port est ouvert
-netstat -an | findstr ":8443" >nul 2>&1
+netstat -an | findstr ":9597" >nul 2>&1
 if %errorLevel% equ 0 (
-    echo ✅ Port 8443 en écoute
+    echo ✅ Port 9597 en écoute
 ) else (
-    echo ❌ Port 8443 non accessible
+    echo ❌ Port 9597 non accessible
     echo Le service n'a peut-être pas encore démarré complètement.
 )
 
@@ -41,12 +41,12 @@ echo.
 echo [3/5] Test de l'API de statut...
 
 REM Tester l'endpoint de statut
-curl -k -s https://localhost:8443/api/status >nul 2>&1
+curl -k -s https://localhost:9597/api/status >nul 2>&1
 if %errorLevel% equ 0 (
     echo ✅ API accessible
     echo.
     echo Détails du statut:
-    curl -k -s https://localhost:8443/api/status
+    curl -k -s https://localhost:9597/api/status
 ) else (
     echo ❌ API non accessible
     echo Vérifiez les logs: C:\ProgramData\OphtalmoPro\eID-Bridge\Logs\
@@ -82,12 +82,12 @@ echo.
 echo [5/5] Test des lecteurs de cartes...
 
 REM Tester l'endpoint des lecteurs
-curl -k -s https://localhost:8443/api/readers >nul 2>&1
+curl -k -s https://localhost:9597/api/readers >nul 2>&1
 if %errorLevel% equ 0 (
     echo ✅ Endpoint lecteurs accessible
     echo.
     echo Lecteurs détectés:
-    curl -k -s https://localhost:8443/api/readers
+    curl -k -s https://localhost:9597/api/readers
 ) else (
     echo ❌ Impossible de récupérer les lecteurs
 )
@@ -103,12 +103,12 @@ if defined MIDDLEWARE_FOUND (
     echo ✅ Configuration opérationnelle
     echo.
     echo Votre application web peut maintenant utiliser:
-    echo - URL API: https://localhost:8443/api/
+    echo - URL API: https://localhost:9597/api/
     echo - Endpoint lecture: POST /api/read-card
     echo - Endpoint statut: GET /api/status
     echo.
     echo Exemple d'utilisation JavaScript:
-    echo fetch('https://localhost:8443/api/read-card', {
+    echo fetch('https://localhost:9597/api/read-card', {
     echo   method: 'POST',
     echo   headers: { 'Content-Type': 'application/json' },
     echo   body: JSON.stringify({ includePhoto: true, includeAddress: true })
