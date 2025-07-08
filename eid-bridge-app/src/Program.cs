@@ -43,6 +43,9 @@ namespace OphtalmoPro.EidBridge
                 _selectedPort = FindAvailablePort(8443);
                 Console.WriteLine($"🌐 Port sélectionné: {_selectedPort}");
                 
+                // Stocker le port sélectionné pour Kestrel
+                Environment.SetEnvironmentVariable("SELECTED_PORT", _selectedPort.ToString());
+                
                 CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
@@ -137,8 +140,11 @@ namespace OphtalmoPro.EidBridge
                     // Configuration HTTPS avec certificat auto-généré
                     webBuilder.ConfigureKestrel(options =>
                     {
+                        // Utiliser le port détecté dynamiquement
+                        var port = int.Parse(Environment.GetEnvironmentVariable("SELECTED_PORT") ?? "8443");
+                        
                         // Port HTTPS sécurisé
-                        options.ListenLocalhost(_selectedPort, listenOptions =>
+                        options.ListenLocalhost(port, listenOptions =>
                         {
                             listenOptions.UseHttps(GetOrCreateCertificate());
                         });

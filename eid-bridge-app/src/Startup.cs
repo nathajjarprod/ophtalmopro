@@ -151,7 +151,7 @@ namespace OphtalmoPro.EidBridge
                 if (context.Request.Path == "/")
                 {
                     context.Response.ContentType = "text/html";
-                    var port = context.Request.Host.Port ?? 8443;
+                    var port = context.Request.Host.Port ?? int.Parse(Environment.GetEnvironmentVariable("SELECTED_PORT") ?? "8443");
                     await context.Response.WriteAsync(@"
 <!DOCTYPE html>
 <html>
@@ -176,6 +176,7 @@ namespace OphtalmoPro.EidBridge
     </div>
     <p><strong>Version :</strong> 1.0.0</p>
     <p><strong>Démarré :</strong> " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + @"</p>
+    <p><strong>Port :</strong> " + port + @"</p>
 </body>
 </html>");
                 }
