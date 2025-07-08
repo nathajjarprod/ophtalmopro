@@ -302,11 +302,13 @@ namespace OphtalmoPro.EidBridge
                 {
                     webBuilder.UseStartup<Startup>();
                     
-                    // Configuration HTTPS avec certificat auto-généré
+                    // Configuration Kestrel sans conflit avec appsettings.json
                     webBuilder.ConfigureKestrel(options =>
                     {
-                        // Utiliser le port détecté dynamiquement
+                        // Utiliser uniquement le port détecté dynamiquement
                         var port = int.Parse(Environment.GetEnvironmentVariable("SELECTED_PORT") ?? "8443");
+                        
+                        Console.WriteLine($"🔧 Configuration Kestrel pour port {port}");
                         
                         // Configuration port unique HTTPS seulement
                         options.ListenLocalhost(port, listenOptions =>
@@ -314,7 +316,17 @@ namespace OphtalmoPro.EidBridge
                             listenOptions.UseHttps(GetOrCreateCertificate());
                             listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
                         });
+                        
+                        // Aussi écouter sur 127.0.0.1 pour compatibilité
+                        options.Listen(System.Net.IPAddress.Parse("127.0.0.1"), port, listenOptions =>
+                        {
+                            listenOptions.UseHttps(GetOrCreateCertificate());
+                            listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+                        });
                     });
+                    
+                    // Désactiver les URLs par défaut pour éviter les conflits
+                    webBuilder.UseUrls(); // Vide = pas d'URLs par défaut
                 })
                 .ConfigureLogging(logging =>
                 {
