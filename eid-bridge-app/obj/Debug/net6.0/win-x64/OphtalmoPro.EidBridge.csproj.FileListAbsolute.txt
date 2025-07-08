@@ -1,0 +1,9 @@
+D:\OphtalmoPro\ophtalmopro\eid-bridge-app\obj\Debug\net6.0\win-x64\OphtalmoPro.EidBridge.csproj.AssemblyReference.cache
+D:\OphtalmoPro\ophtalmopro\eid-bridge-app\obj\Debug\net6.0\win-x64\rpswa.dswa.cache.json
+D:\OphtalmoPro\ophtalmopro\eid-bridge-app\obj\Debug\net6.0\win-x64\OphtalmoPro.EidBridge.GeneratedMSBuildEditorConfig.editorconfig
+D:\OphtalmoPro\ophtalmopro\eid-bridge-app\obj\Debug\net6.0\win-x64\OphtalmoPro.EidBridge.AssemblyInfoInputs.cache
+D:\OphtalmoPro\ophtalmopro\eid-bridge-app\obj\Debug\net6.0\win-x64\OphtalmoPro.EidBridge.AssemblyInfo.cs
+D:\OphtalmoPro\ophtalmopro\eid-bridge-app\obj\Debug\net6.0\win-x64\OphtalmoPro.EidBridge.csproj.CoreCompileInputs.cache
+D:\OphtalmoPro\ophtalmopro\eid-bridge-app\obj\Debug\net6.0\win-x64\OphtalmoPro.EidBridge.MvcApplicationPartsAssemblyInfo.cs
+D:\OphtalmoPro\ophtalmopro\eid-bridge-app\obj\Debug\net6.0\win-x64\OphtalmoPro.EidBridge.MvcApplicationPartsAssemblyInfo.cache
+D:\OphtalmoPro\ophtalmopro\eid-bridge-app\obj\Debug\net6.0\win-x64\OphtalmoPro.EidBridge.sourcelink.json
