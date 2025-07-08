@@ -75,17 +75,17 @@ namespace OphtalmoPro.EidBridge.Services
 
                 var eidData = new EidData
                 {
-                    FirstName = identity.FirstName,
-                    LastName = identity.LastName,
-                    FirstName = GetJsonValue(rawData, "first_name", "firstName", "given_name") ?? "",
-                    LastName = GetJsonValue(rawData, "last_name", "lastName", "surname") ?? "",
-                    DateOfBirth = GetJsonValue(rawData, "date_of_birth", "dateOfBirth", "birth_date") ?? "",
-                    PlaceOfBirth = GetJsonValue(rawData, "place_of_birth", "placeOfBirth", "birth_place") ?? "",
-                    Nationality = GetJsonValue(rawData, "nationality", "nationalite") ?? "",
-                    Niss = GetJsonValue(rawData, "national_number", "niss", "rrn") ?? "",
-                    CardNumber = GetJsonValue(rawData, "card_number", "cardNumber", "chip_number") ?? "",
-                    ValidityBeginDate = GetJsonValue(rawData, "validity_begin_date", "validityBeginDate", "valid_from") ?? "",
-                    ValidityEndDate = GetJsonValue(rawData, "validity_end_date", "validityEndDate", "valid_until") ?? ""
+                    FirstName = identity.FirstName ?? "",
+                    LastName = identity.LastName ?? "",
+                    DateOfBirth = identity.DateOfBirth ?? "",
+                    PlaceOfBirth = identity.PlaceOfBirth ?? "",
+                    Nationality = identity.Nationality ?? "",
+                    Niss = identity.Niss ?? "",
+                    CardNumber = identity.CardNumber ?? "",
+                    ValidityBeginDate = identity.ValidityBeginDate ?? "",
+                    ValidityEndDate = identity.ValidityEndDate ?? "",
+                    Address = address ?? new EidAddress(),
+                    Photo = photo
                 };
 
                 _logger.LogInformation("Lecture carte eID terminée avec succès pour {FirstName} {LastName}", 
@@ -159,15 +159,15 @@ namespace OphtalmoPro.EidBridge.Services
                         
                         return new IdentityData
                         {
-                            FirstName = GetJsonValue(rawData, "first_name", "firstName", "given_name"),
-                            LastName = GetJsonValue(rawData, "last_name", "lastName", "surname"),
-                            DateOfBirth = GetJsonValue(rawData, "date_of_birth", "dateOfBirth", "birth_date"),
-                            PlaceOfBirth = GetJsonValue(rawData, "place_of_birth", "placeOfBirth", "birth_place"),
-                            Nationality = GetJsonValue(rawData, "nationality", "nationalite"),
-                            Niss = GetJsonValue(rawData, "national_number", "niss", "rrn"),
-                            CardNumber = GetJsonValue(rawData, "card_number", "cardNumber", "chip_number"),
-                            ValidityBeginDate = GetJsonValue(rawData, "validity_begin_date", "validityBeginDate", "valid_from"),
-                            ValidityEndDate = GetJsonValue(rawData, "validity_end_date", "validityEndDate", "valid_until")
+                            FirstName = GetJsonValue(rawData, "first_name", "firstName", "given_name") ?? "",
+                            LastName = GetJsonValue(rawData, "last_name", "lastName", "surname") ?? "",
+                            DateOfBirth = GetJsonValue(rawData, "date_of_birth", "dateOfBirth", "birth_date") ?? "",
+                            PlaceOfBirth = GetJsonValue(rawData, "place_of_birth", "placeOfBirth", "birth_place") ?? "",
+                            Nationality = GetJsonValue(rawData, "nationality", "nationalite") ?? "",
+                            Niss = GetJsonValue(rawData, "national_number", "niss", "rrn") ?? "",
+                            CardNumber = GetJsonValue(rawData, "card_number", "cardNumber", "chip_number") ?? "",
+                            ValidityBeginDate = GetJsonValue(rawData, "validity_begin_date", "validityBeginDate", "valid_from") ?? "",
+                            ValidityEndDate = GetJsonValue(rawData, "validity_end_date", "validityEndDate", "valid_until") ?? ""
                         };
                     }
                 }
@@ -338,15 +338,15 @@ namespace OphtalmoPro.EidBridge.Services
     // Classes de données internes
     internal class IdentityData
     {
-        public string FirstName { get; set; } = "";
-        public string LastName { get; set; } = "";
-        public string DateOfBirth { get; set; } = "";
-        public string PlaceOfBirth { get; set; } = "";
-        public string Nationality { get; set; } = "";
-        public string Niss { get; set; } = "";
-        public string CardNumber { get; set; } = "";
-        public string ValidityBeginDate { get; set; } = "";
-        public string ValidityEndDate { get; set; } = "";
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? DateOfBirth { get; set; }
+        public string? PlaceOfBirth { get; set; }
+        public string? Nationality { get; set; }
+        public string? Niss { get; set; }
+        public string? CardNumber { get; set; }
+        public string? ValidityBeginDate { get; set; }
+        public string? ValidityEndDate { get; set; }
     }
 
     // Exceptions personnalisées
