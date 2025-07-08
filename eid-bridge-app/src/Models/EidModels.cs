@@ -15,7 +15,7 @@ namespace OphtalmoPro.EidBridge.Models
     public class TokenRequest
     {
         [Required]
-        public required string ApplicationId { get; set; }
+        public string ApplicationId { get; set; } = string.Empty;
     }
 
     // Modèles de réponse
@@ -31,81 +31,81 @@ namespace OphtalmoPro.EidBridge.Models
 
     public class ServiceStatusResponse
     {
-        public required string Status { get; set; }
-        public required string Middleware { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public string Middleware { get; set; } = string.Empty;
         public int Readers { get; set; }
         public int ReadersWithCard { get; set; }
         public DateTime? LastRead { get; set; }
-        public required string Version { get; set; }
+        public string Version { get; set; } = string.Empty;
         public TimeSpan Uptime { get; set; }
     }
 
     public class ReadersResponse
     {
         public bool Success { get; set; }
-        public required List<ReaderInfo> Readers { get; set; }
+        public List<ReaderInfo> Readers { get; set; } = new();
         public DateTime Timestamp { get; set; }
     }
 
     public class TokenResponse
     {
-        public required string Token { get; set; }
+        public string Token { get; set; } = string.Empty;
         public int ExpiresIn { get; set; }
-        public required string TokenType { get; set; }
+        public string TokenType { get; set; } = string.Empty;
     }
 
     public class DiagnosticResponse
     {
         public DateTime Timestamp { get; set; }
-        public required string ServiceVersion { get; set; }
-        public required string OperatingSystem { get; set; }
-        public required string DotNetVersion { get; set; }
-        public required MiddlewareDiagnostic Middleware { get; set; }
-        public required List<ReaderDiagnostic> Readers { get; set; }
-        public required MemoryInfo Memory { get; set; }
+        public string ServiceVersion { get; set; } = string.Empty;
+        public string OperatingSystem { get; set; } = string.Empty;
+        public string DotNetVersion { get; set; } = string.Empty;
+        public MiddlewareDiagnostic Middleware { get; set; } = new();
+        public List<ReaderDiagnostic> Readers { get; set; } = new();
+        public MemoryInfo Memory { get; set; } = new();
         public TimeSpan Uptime { get; set; }
     }
 
     // Modèles de données eID
     public class EidData
     {
-        public required string FirstName { get; set; }
-        public required string LastName { get; set; }
-        public required string DateOfBirth { get; set; }
-        public required string PlaceOfBirth { get; set; }
-        public required string Nationality { get; set; }
-        public required string Niss { get; set; }
-        public required string CardNumber { get; set; }
-        public required string ValidityBeginDate { get; set; }
-        public required string ValidityEndDate { get; set; }
-        public required EidAddress Address { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string DateOfBirth { get; set; } = string.Empty;
+        public string PlaceOfBirth { get; set; } = string.Empty;
+        public string Nationality { get; set; } = string.Empty;
+        public string Niss { get; set; } = string.Empty;
+        public string CardNumber { get; set; } = string.Empty;
+        public string ValidityBeginDate { get; set; } = string.Empty;
+        public string ValidityEndDate { get; set; } = string.Empty;
+        public EidAddress Address { get; set; } = new();
         public string? Photo { get; set; }
     }
 
     public class EidAddress
     {
-        public required string Street { get; set; }
-        public required string PostalCode { get; set; }
-        public required string City { get; set; }
-        public required string Country { get; set; }
+        public string Street { get; set; } = string.Empty;
+        public string PostalCode { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
+        public string Country { get; set; } = string.Empty;
     }
 
     // Modèles de lecteurs
     public class ReaderInfo
     {
-        public required string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public bool HasCard { get; set; }
-        public required string Status { get; set; }
+        public string Status { get; set; } = string.Empty;
         public DateTime? LastActivity { get; set; }
     }
 
     public class CardReader
     {
-        public required string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public bool HasCard { get; set; }
-        public required string Status { get; set; }
+        public string Status { get; set; } = string.Empty;
         public DateTime? LastActivity { get; set; }
-        public required string Driver { get; set; }
+        public string Driver { get; set; } = string.Empty;
         public bool IsConnected { get; set; }
     }
 
@@ -114,7 +114,7 @@ namespace OphtalmoPro.EidBridge.Models
     {
         public bool IsAvailable { get; set; }
         public string? WorkingPort { get; set; }
-        public required List<string> TestedPorts { get; set; }
+        public List<string> TestedPorts { get; set; } = new();
         public string? Version { get; set; }
         public string? ServiceName { get; set; }
         public string? LastError { get; set; }
@@ -122,9 +122,9 @@ namespace OphtalmoPro.EidBridge.Models
 
     public class ReaderDiagnostic
     {
-        public required string Name { get; set; }
-        public required string Status { get; set; }
-        public required string Driver { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public string Driver { get; set; } = string.Empty;
         public bool IsConnected { get; set; }
         public DateTime LastCheck { get; set; }
         public string? LastError { get; set; }
@@ -147,9 +147,9 @@ namespace OphtalmoPro.EidBridge.Models
     // Modèles d'audit
     public class CardReadAudit
     {
-        public required string RequestId { get; set; }
-        public required string ClientIp { get; set; }
-        public required string ReaderName { get; set; }
+        public string RequestId { get; set; } = string.Empty;
+        public string ClientIp { get; set; } = string.Empty;
+        public string ReaderName { get; set; } = string.Empty;
         public bool Success { get; set; }
         public object? DataRead { get; set; }
         public string? Error { get; set; }

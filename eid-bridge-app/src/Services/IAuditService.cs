@@ -5,7 +5,7 @@ namespace OphtalmoPro.EidBridge.Services
     public interface IAuditService
     {
         Task LogCardReadAsync(CardReadAudit audit);
-        Task LogSecurityEventAsync(string eventType, string details, string clientIp = null);
+        Task LogSecurityEventAsync(string eventType, string details, string? clientIp = null);
         Task LogSystemEventAsync(string eventType, string details);
         DateTime? GetLastReadTime();
         Task<List<CardReadAudit>> GetRecentReadsAsync(int count = 10);
@@ -122,7 +122,8 @@ namespace OphtalmoPro.EidBridge.Services
         {
             lock (_lockObject)
             {
-                return _recentReads.LastOrDefault(r => r.Success)?.Timestamp;
+                var lastSuccessfulRead = _recentReads.LastOrDefault(r => r.Success);
+                return lastSuccessfulRead?.Timestamp;
             }
         }
 

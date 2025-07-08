@@ -17,6 +17,7 @@
     <FileVersion>1.0.0.0</FileVersion>
     <Copyright>Copyright © OphtalmoPro 2024</Copyright>
     <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <LangVersion>11.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
