@@ -155,6 +155,27 @@ const readEidCard = async () => {
 
 ## 🔍 Dépannage
 
+### Problème de Certificat SSL
+
+Si vous obtenez l'erreur "Le chemin d'accès spécifié est introuvable" :
+
+1. **Test du certificat** :
+   ```cmd
+   test-certificate.bat
+   ```
+
+2. **Correction automatique** :
+   ```cmd
+   fix-certificate-issue.bat
+   ```
+
+3. **Création manuelle** :
+   ```cmd
+   create-certificate.bat
+   ```
+
+4. **Si le problème persiste**, l'application peut générer automatiquement le certificat au démarrage.
+
 ### Problème de Port "Address already in use"
 
 Si vous obtenez l'erreur "Failed to bind to address", suivez ces étapes :
