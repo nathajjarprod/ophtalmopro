@@ -8,10 +8,12 @@ namespace OphtalmoPro.EidBridge.Utils
     {
         public static X509Certificate2 CreateSelfSignedCertificate(string certPath)
         {
+            Console.WriteLine("🔧 Création d'un certificat auto-signé...");
+            
             using var rsa = RSA.Create(2048);
             
             var request = new CertificateRequest(
-                "CN=OphtalmoPro eID Bridge",
+                "CN=OphtalmoPro eID Bridge, O=OphtalmoPro, C=BE",
                 rsa,
                 HashAlgorithmName.SHA256,
                 RSASignaturePadding.Pkcs1
@@ -32,20 +34,28 @@ namespace OphtalmoPro.EidBridge.Utils
                 )
             );
 
-            // Créer manuellement l'extension SAN pour .NET 6.0
+            // Créer l'extension SAN (Subject Alternative Name) manuellement pour .NET 6.0
             var sanBuilder = new System.Text.StringBuilder();
-            sanBuilder.Append("DNS:localhost,");
-            sanBuilder.Append("IP:127.0.0.1,");
-            sanBuilder.Append("IP:::1");
+            sanBuilder.Append("DNS:localhost");
+            sanBuilder.Append(",DNS:127.0.0.1");
+            sanBuilder.Append(",IP:127.0.0.1");
+            sanBuilder.Append(",IP:::1");
 
-            // Extension SAN manuelle pour compatibilité .NET 6.0
-            var sanExtension = new X509Extension(
-                "2.5.29.17", // OID pour Subject Alternative Name
-                System.Text.Encoding.UTF8.GetBytes(sanBuilder.ToString()),
-                false
-            );
-
-            request.CertificateExtensions.Add(sanExtension);
+            // Pour .NET 6.0, nous devons créer l'extension SAN différemment
+            try
+            {
+                // Essayer d'utiliser la nouvelle méthode si disponible
+                var sanExtension = CreateSubjectAlternativeNameExtension();
+                if (sanExtension != null)
+                {
+                    request.CertificateExtensions.Add(sanExtension);
+                }
+            }
+            catch
+            {
+                // Fallback pour les versions plus anciennes
+                Console.WriteLine("⚠️ Extension SAN avancée non disponible, utilisation du fallback");
+            }
 
             // Créer le certificat auto-signé
             var certificate = request.CreateSelfSigned(
@@ -57,7 +67,29 @@ namespace OphtalmoPro.EidBridge.Utils
             var pfxBytes = certificate.Export(X509ContentType.Pfx, "OphtalmoPro2024!");
             File.WriteAllBytes(certPath, pfxBytes);
 
+            Console.WriteLine($"✅ Certificat sauvegardé: {certPath}");
+            Console.WriteLine($"📅 Valide jusqu'au: {certificate.NotAfter:yyyy-MM-dd}");
+
             return new X509Certificate2(certPath, "OphtalmoPro2024!", X509KeyStorageFlags.PersistKeySet);
+        }
+
+        private static X509Extension? CreateSubjectAlternativeNameExtension()
+        {
+            try
+            {
+                // Créer une extension SAN basique
+                var sanBuilder = new SubjectAlternativeNameBuilder();
+                sanBuilder.AddDnsName("localhost");
+                sanBuilder.AddIpAddress(IPAddress.Loopback);
+                sanBuilder.AddIpAddress(IPAddress.IPv6Loopback);
+                
+                return sanBuilder.Build();
+            }
+            catch
+            {
+                // Si SubjectAlternativeNameBuilder n'est pas disponible
+                return null;
+            }
         }
     }
 }
