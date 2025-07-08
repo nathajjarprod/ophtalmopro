@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OphtalmoPro.EidBridge.Utils;
 using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
@@ -62,10 +63,6 @@ namespace OphtalmoPro.EidBridge
                     logging.ClearProviders();
                     logging.AddConsole();
                     logging.AddEventLog(); // Logs Windows Event Log
-                    logging.AddFile(Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                        "OphtalmoPro", "eID-Bridge", "Logs", "app.log"
-                    ));
                 });
 
         private static X509Certificate2 GetOrCreateCertificate()

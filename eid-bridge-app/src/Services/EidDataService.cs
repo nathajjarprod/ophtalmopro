@@ -19,7 +19,7 @@ namespace OphtalmoPro.EidBridge.Services
         private readonly ILogger<EidDataService> _logger;
         private readonly HttpClient _httpClient;
         private readonly string[] _middlewarePorts = { "53001", "35963", "35964", "24727" };
-        private string _workingPort = null;
+        private string? _workingPort = null;
 
         public EidDataService(ILogger<EidDataService> logger)
         {
@@ -351,13 +351,13 @@ namespace OphtalmoPro.EidBridge.Services
 
     // Exceptions personnalisées
     public class MiddlewareException : Exception
-    {
-        public MiddlewareException(string message) : base(message) { }
-        public MiddlewareException(string message, Exception innerException) : base(message, innerException) { }
-    }
-
-    public class CardNotPresentException : Exception
-    {
-        public CardNotPresentException(string message) : base(message) { }
-    }
+    public string FirstName { get; set; } = "";
+    public string LastName { get; set; } = "";
+    public string DateOfBirth { get; set; } = "";
+    public string PlaceOfBirth { get; set; } = "";
+    public string Nationality { get; set; } = "";
+    public string Niss { get; set; } = "";
+    public string CardNumber { get; set; } = "";
+    public string ValidityBeginDate { get; set; } = "";
+    public string ValidityEndDate { get; set; } = "";
 }

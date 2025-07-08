@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using OphtalmoPro.EidBridge.Services;
 using OphtalmoPro.EidBridge.Middleware;
+using OphtalmoPro.EidBridge.HealthChecks;
 using System.Text.Json;
 
 namespace OphtalmoPro.EidBridge

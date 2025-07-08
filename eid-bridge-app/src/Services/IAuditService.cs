@@ -76,7 +76,7 @@ namespace OphtalmoPro.EidBridge.Services
             try
             {
                 _logger.LogWarning("Événement sécurité - Type: {EventType}, Client: {ClientIp}, Détails: {Details}",
-                    eventType, clientIp, details);
+                    eventType, clientIp ?? "unknown", details);
 
                 var logEntry = new
                 {

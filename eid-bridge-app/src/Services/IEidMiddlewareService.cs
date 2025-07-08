@@ -63,7 +63,7 @@ namespace OphtalmoPro.EidBridge.Services
                         
                         if (serviceInfo?.ContainsKey("version") == true)
                         {
-                            return serviceInfo["version"].ToString();
+                            return serviceInfo["version"]?.ToString() ?? "Inconnue";
                         }
                     }
                 }
@@ -96,8 +96,8 @@ namespace OphtalmoPro.EidBridge.Services
                             {
                                 readers.Add(new CardReader
                                 {
-                                    Name = reader.GetValueOrDefault("name", "Lecteur inconnu").ToString(),
-                                    HasCard = bool.Parse(reader.GetValueOrDefault("card_present", false).ToString()),
+                                    Name = reader.GetValueOrDefault("name", "Lecteur inconnu")?.ToString() ?? "Lecteur inconnu",
+                                    HasCard = bool.Parse(reader.GetValueOrDefault("card_present", false)?.ToString() ?? "false"),
                                     IsConnected = true,
                                     Status = "Connected",
                                     Driver = "PC/SC",
@@ -132,15 +132,22 @@ namespace OphtalmoPro.EidBridge.Services
 
                     var eidData = new EidData
                     {
-                        FirstName = identity?.GetValueOrDefault("first_name", "").ToString() ?? "",
-                        LastName = identity?.GetValueOrDefault("last_name", "").ToString() ?? "",
-                        DateOfBirth = identity?.GetValueOrDefault("date_of_birth", "").ToString() ?? "",
-                        PlaceOfBirth = identity?.GetValueOrDefault("place_of_birth", "").ToString() ?? "",
-                        Nationality = identity?.GetValueOrDefault("nationality", "").ToString() ?? "",
-                        Niss = identity?.GetValueOrDefault("national_number", "").ToString() ?? "",
-                        CardNumber = identity?.GetValueOrDefault("card_number", "").ToString() ?? "",
-                        ValidityBeginDate = identity?.GetValueOrDefault("validity_begin_date", "").ToString() ?? "",
-                        ValidityEndDate = identity?.GetValueOrDefault("validity_end_date", "").ToString() ?? ""
+                        FirstName = identity?.GetValueOrDefault("first_name", "")?.ToString() ?? "",
+                        LastName = identity?.GetValueOrDefault("last_name", "")?.ToString() ?? "",
+                        DateOfBirth = identity?.GetValueOrDefault("date_of_birth", "")?.ToString() ?? "",
+                        PlaceOfBirth = identity?.GetValueOrDefault("place_of_birth", "")?.ToString() ?? "",
+                        Nationality = identity?.GetValueOrDefault("nationality", "")?.ToString() ?? "",
+                        Niss = identity?.GetValueOrDefault("national_number", "")?.ToString() ?? "",
+                        CardNumber = identity?.GetValueOrDefault("card_number", "")?.ToString() ?? "",
+                        ValidityBeginDate = identity?.GetValueOrDefault("validity_begin_date", "")?.ToString() ?? "",
+                        ValidityEndDate = identity?.GetValueOrDefault("validity_end_date", "")?.ToString() ?? "",
+                        Address = new EidAddress
+                        {
+                            Street = "",
+                            PostalCode = "",
+                            City = "",
+                            Country = "Belgique"
+                        }
                     };
 
                     // Lire l'adresse si demandée
@@ -156,10 +163,10 @@ namespace OphtalmoPro.EidBridge.Services
                                 
                                 eidData.Address = new EidAddress
                                 {
-                                    Street = address?.GetValueOrDefault("street_and_number", "").ToString() ?? "",
-                                    PostalCode = address?.GetValueOrDefault("zip_code", "").ToString() ?? "",
-                                    City = address?.GetValueOrDefault("municipality", "").ToString() ?? "",
-                                    Country = address?.GetValueOrDefault("country", "Belgique").ToString() ?? "Belgique"
+                                    Street = address?.GetValueOrDefault("street_and_number", "")?.ToString() ?? "",
+                                    PostalCode = address?.GetValueOrDefault("zip_code", "")?.ToString() ?? "",
+                                    City = address?.GetValueOrDefault("municipality", "")?.ToString() ?? "",
+                                    Country = address?.GetValueOrDefault("country", "Belgique")?.ToString() ?? "Belgique"
                                 };
                             }
                         }
@@ -219,8 +226,8 @@ namespace OphtalmoPro.EidBridge.Services
                         var content = await response.Content.ReadAsStringAsync();
                         var serviceInfo = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(content);
                         
-                        diagnostic.Version = serviceInfo?.GetValueOrDefault("version", "").ToString();
-                        diagnostic.ServiceName = serviceInfo?.GetValueOrDefault("name", "eID Middleware").ToString();
+                        diagnostic.Version = serviceInfo?.GetValueOrDefault("version", "")?.ToString();
+                        diagnostic.ServiceName = serviceInfo?.GetValueOrDefault("name", "eID Middleware")?.ToString();
                         break;
                     }
                 }

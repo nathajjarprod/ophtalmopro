@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using OphtalmoPro.EidBridge.Models;
 using OphtalmoPro.EidBridge.Services;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace OphtalmoPro.EidBridge.Controllers

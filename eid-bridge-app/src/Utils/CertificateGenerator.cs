@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Net;
 
 namespace OphtalmoPro.EidBridge.Utils
 {
@@ -31,15 +32,13 @@ namespace OphtalmoPro.EidBridge.Utils
                 )
             );
 
+            var sanBuilder = new SubjectAlternativeNameBuilder();
+            sanBuilder.AddDnsName("localhost");
+            sanBuilder.AddIpAddress(IPAddress.Loopback);
+            sanBuilder.AddIpAddress(IPAddress.IPv6Loopback);
+            
             request.CertificateExtensions.Add(
-                new X509SubjectAlternativeNameExtension(
-                    new SubjectAlternativeNameBuilder()
-                        .AddDnsName("localhost")
-                        .AddIpAddress(System.Net.IPAddress.Loopback)
-                        .AddIpAddress(System.Net.IPAddress.IPv6Loopback)
-                        .Build(),
-                    critical: false
-                )
+                new X509SubjectAlternativeNameExtension(sanBuilder.Build(), critical: false)
             );
 
             // Créer le certificat auto-signé

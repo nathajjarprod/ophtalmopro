@@ -14,7 +14,6 @@ namespace OphtalmoPro.EidBridge.Services
     public class CardReaderService : ICardReaderService
     {
         private readonly ILogger<CardReaderService> _logger;
-        private readonly Timer _monitoringTimer;
         private List<CardReader> _cachedReaders = new();
 
         public CardReaderService(ILogger<CardReaderService> logger)

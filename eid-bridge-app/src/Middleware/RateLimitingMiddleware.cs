@@ -17,7 +17,7 @@ namespace OphtalmoPro.EidBridge.Middleware
             _configuration = configuration;
             
             // Nettoyer les anciennes entrées toutes les minutes
-            _cleanupTimer = new Timer(CleanupOldEntries, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+            _cleanupTimer = new Timer(CleanupOldEntries!, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -52,7 +52,7 @@ namespace OphtalmoPro.EidBridge.Middleware
             await _next(context);
         }
 
-        private void CleanupOldEntries(object state)
+        private void CleanupOldEntries(object? state)
         {
             var cutoff = DateTime.UtcNow.AddMinutes(-5);
             var keysToRemove = new List<string>();
