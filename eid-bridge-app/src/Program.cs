@@ -301,17 +301,18 @@ namespace OphtalmoPro.EidBridge
                     // Configuration HTTPS avec certificat auto-généré
                     webBuilder.ConfigureKestrel(options =>
                     {
+                        // Désactiver tous les endpoints par défaut
+                        options.ConfigureEndpointDefaults(lo => lo.Reset());
+                        
                         // Utiliser le port détecté dynamiquement
                         var port = int.Parse(Environment.GetEnvironmentVariable("SELECTED_PORT") ?? "8443");
                         
-                        // Configuration port unique HTTPS
-                        options.ListenLocalhost(port, listenOptions =>
+                        // Configuration port unique HTTPS seulement
+                        options.Listen(System.Net.IPAddress.Loopback, port, listenOptions =>
                         {
                             listenOptions.UseHttps(GetOrCreateCertificate());
+                            listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
                         });
-                        
-                        // Désactiver les autres endpoints par défaut
-                        options.ConfigureEndpointDefaults(lo => lo.Protocols = HttpProtocols.Http1AndHttp2);
                     });
                 })
                 .ConfigureLogging(logging =>
