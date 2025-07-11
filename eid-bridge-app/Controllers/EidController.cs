@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using OphtalmoPro.EidBridge.Services;
 using System;
 using System.Threading.Tasks;
 
-namespace EidBridge.Controllers
+namespace OphtalmoPro.EidBridge.Controllers
 {
     [ApiController]
     [Route("api")]

@@ -8,9 +8,9 @@ echo [1/2] Verification des ports...
 netstat -an | findstr ":5000" >nul 2>&1
 if %errorLevel% equ 0 (
     echo Port 5000 deja utilise, tentative sur port alternatif...
-    set ASPNETCORE_URLS=http://localhost:5500;https://localhost:5501
+    set ASPNETCORE_URLS=http://localhost:5500
 ) else (
-    echo Ports par defaut disponibles
+    echo Port par defaut disponible
 )
 
 echo [2/2] Demarrage de l'application...
