@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test eID Bridge</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test eID Bridge</h1>
+        
+        <div class="status info">
+            <p>Cette page permet de tester l'API eID Bridge.</p>
+        </div>
+
+        <h2>Tests</h2>
+        
+        <button onclick="testStatus()">Test Status</button>
+        <button onclick="testReaders()">Test Lecteurs</button>
+        <button onclick="testReadCard()">Test Lecture Carte</button>
+        
+        <div id="results"></div>
+
+        <h2>Code d'exemple</h2>
+        <pre><code>// Lecture de carte eID
+fetch('http://localhost:5000/api/read-card')
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      console.log('Données eID:', data.data);
+      // Utiliser data.data.firstName, data.data.lastName, etc.
+    } else {
+      console.error('Erreur:', data.error);
+    }
+  });</code></pre>
+    </div>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+        const apiUrl = 'http://localhost:5000/api';
+        
+        function showResult(title, content, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${title}</strong><br><pre>${typeof content === 'string' ? content : JSON.stringify(content, null, 2)}</pre>`;
+            resultsDiv.appendChild(div);
+        }
+        
+        async function testStatus() {
+            try {
+                const response = await fetch(`${apiUrl}/status`);
+                const data = await response.json();
+                showResult('✅ Status API', data, 'success');
+            } catch (error) {
+                showResult('❌ Erreur Status', error.message, 'error');
+            }
+        }
+        
+        async function testReaders() {
+            try {
+                const response = await fetch(`${apiUrl}/readers`);
+                const data = await response.json();
+                showResult('✅ Lecteurs', data, 'success');
+            } catch (error) {
+                showResult('❌ Erreur Lecteurs', error.message, 'error');
+            }
+        }
+        
+        async function testReadCard() {
+            try {
+                const response = await fetch(`${apiUrl}/read-card`);
+                const data = await response.json();
+                showResult('✅ Lecture Carte', data, 'success');
+            } catch (error) {
+                showResult('❌ Erreur Lecture', error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
