@@ -3,7 +3,9 @@ using Microsoft.Extensions.Logging;
 using OphtalmoPro.EidBridge.Models;
 using OphtalmoPro.EidBridge.Services;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OphtalmoPro.EidBridge.Controllers
@@ -31,27 +33,22 @@ namespace OphtalmoPro.EidBridge.Controllers
             _securityService = securityService;
             _auditService = auditService;
         }
-    
+
         [HttpGet("readers")]
         public async Task<ActionResult<List<ReaderInfo>>> GetReaders()
         {
             try
-             {
+            {
                 var readers = await _cardReaderService.GetAvailableReadersAsync();
                 return Ok(readers);
             }
-             catch (Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Erreur lors de la récupération des lecteurs");
                 return StatusCode(500, new { error = "Erreur lors de la récupération des lecteurs" });
-             }
+            }
         }
 
-
-
-        /// <summary>
-        /// Obtient le statut du service eID Bridge
-        /// </summary>
         [HttpGet("status")]
         public async Task<ActionResult<ServiceStatusResponse>> GetStatus()
         {
@@ -80,9 +77,6 @@ namespace OphtalmoPro.EidBridge.Controllers
             }
         }
 
-        /// <summary>
-        /// Lit les données d'une carte eID
-        /// </summary>
         [HttpPost("read-card")]
         public async Task<ActionResult<EidReadResponse>> ReadCard([FromBody] EidReadRequest request)
         {
@@ -91,23 +85,19 @@ namespace OphtalmoPro.EidBridge.Controllers
 
             try
             {
-                _logger.LogInformation("Début lecture carte eID - Request ID: {RequestId}, Client: {ClientIp}", 
-                    requestId, clientIp);
+                _logger.LogInformation("Début lecture carte eID - Request ID: {RequestId}, Client: {ClientIp}", requestId, clientIp);
 
-                // Validation de sécurité
                 if (!_securityService.IsAuthorizedClient(clientIp))
                 {
                     _logger.LogWarning("Tentative d'accès non autorisée depuis {ClientIp}", clientIp);
                     return Unauthorized(new { error = "Accès non autorisé" });
                 }
 
-                // Validation des paramètres
                 if (request == null)
                 {
                     return BadRequest(new { error = "Paramètres de requête manquants" });
                 }
 
-                // Vérifier la disponibilité des lecteurs
                 var readers = await _cardReaderService.GetAvailableReadersAsync();
                 var readerWithCard = readers.FirstOrDefault(r => r.HasCard);
 
@@ -123,9 +113,8 @@ namespace OphtalmoPro.EidBridge.Controllers
                     });
                 }
 
-                // Lecture des données eID
                 _logger.LogInformation("Lecture des données eID sur le lecteur: {ReaderName}", readerWithCard.Name);
-                
+
                 var eidData = await _eidDataService.ReadCardDataAsync(new EidReadOptions
                 {
                     IncludePhoto = request.IncludePhoto,
@@ -133,11 +122,23 @@ namespace OphtalmoPro.EidBridge.Controllers
                     Timeout = TimeSpan.FromMilliseconds(request.Timeout ?? 30000)
                 });
 
-                // Audit de la lecture
+                if (eidData == null)
+                {
+                    _logger.LogError("Lecture des données eID a renvoyé null");
+                    return StatusCode(500, new EidReadResponse
+                    {
+                        Success = false,
+                        Error = "Impossible de lire les données de la carte",
+                        ErrorCode = "NULL_CARD_DATA",
+                        RequestId = requestId,
+                        Timestamp = DateTime.UtcNow
+                    });
+                }
+
                 await _auditService.LogCardReadAsync(new CardReadAudit
                 {
                     RequestId = requestId,
-                    ClientIp = clientIp ?? "unknown",
+                    ClientIp = clientIp,
                     ReaderName = readerWithCard.Name,
                     Success = true,
                     DataRead = new
@@ -149,8 +150,7 @@ namespace OphtalmoPro.EidBridge.Controllers
                     Timestamp = DateTime.UtcNow
                 });
 
-                _logger.LogInformation("Lecture carte eID réussie - Request ID: {RequestId}, Patient: {PatientName}", 
-                    requestId, $"{eidData.FirstName} {eidData.LastName}");
+                _logger.LogInformation("Lecture carte eID réussie - Request ID: {RequestId}, Patient: {PatientName}", requestId, $"{eidData.FirstName} {eidData.LastName}");
 
                 return Ok(new EidReadResponse
                 {
@@ -163,11 +163,11 @@ namespace OphtalmoPro.EidBridge.Controllers
             catch (TimeoutException ex)
             {
                 _logger.LogWarning(ex, "Timeout lors de la lecture carte eID - Request ID: {RequestId}", requestId);
-                
+
                 await _auditService.LogCardReadAsync(new CardReadAudit
                 {
                     RequestId = requestId,
-                    ClientIp = clientIp ?? "unknown",
+                    ClientIp = clientIp,
                     Success = false,
                     Error = "Timeout",
                     Timestamp = DateTime.UtcNow
@@ -185,7 +185,7 @@ namespace OphtalmoPro.EidBridge.Controllers
             catch (CardNotPresentException ex)
             {
                 _logger.LogWarning(ex, "Carte non présente - Request ID: {RequestId}", requestId);
-                
+
                 return BadRequest(new EidReadResponse
                 {
                     Success = false,
@@ -198,7 +198,7 @@ namespace OphtalmoPro.EidBridge.Controllers
             catch (MiddlewareException ex)
             {
                 _logger.LogError(ex, "Erreur middleware eID - Request ID: {RequestId}", requestId);
-                
+
                 return StatusCode(503, new EidReadResponse
                 {
                     Success = false,
@@ -211,7 +211,7 @@ namespace OphtalmoPro.EidBridge.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erreur inattendue lors de la lecture carte eID - Request ID: {RequestId}", requestId);
-                
+
                 await _auditService.LogCardReadAsync(new CardReadAudit
                 {
                     RequestId = requestId,
@@ -232,33 +232,24 @@ namespace OphtalmoPro.EidBridge.Controllers
             }
         }
 
-        /// <summary>
-        /// Obtient la liste des lecteurs de cartes disponibles
-        /// </summary>
-        
-       
-
-        /// <summary>
-        /// Génère un token d'authentification temporaire
-        /// </summary>
         [HttpPost("auth/token")]
         public ActionResult<TokenResponse> GenerateToken([FromBody] TokenRequest request)
         {
             try
             {
                 var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-                
+
                 if (!_securityService.IsAuthorizedClient(clientIp))
                 {
                     return Unauthorized(new { error = "Accès non autorisé" });
                 }
 
                 var token = _securityService.GenerateTemporaryToken(clientIp, request.ApplicationId);
-                
+
                 return Ok(new TokenResponse
                 {
                     Token = token,
-                    ExpiresIn = 300, // 5 minutes
+                    ExpiresIn = 300,
                     TokenType = "Bearer"
                 });
             }
@@ -269,9 +260,6 @@ namespace OphtalmoPro.EidBridge.Controllers
             }
         }
 
-        /// <summary>
-        /// Endpoint de diagnostic pour les tests
-        /// </summary>
         [HttpGet("diagnostic")]
         public async Task<ActionResult<DiagnosticResponse>> GetDiagnostic()
         {

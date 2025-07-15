@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("eidbridge")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8614b7b1ae1e8c4df681f26bfa8681aa477924f5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+808bb4c355c5893e4d4d628dd72ffc2637c1d9f7")]
 [assembly: System.Reflection.AssemblyProductAttribute("eidbridge")]
 [assembly: System.Reflection.AssemblyTitleAttribute("eidbridge")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
