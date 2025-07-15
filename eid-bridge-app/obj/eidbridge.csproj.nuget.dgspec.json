@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\OphtalmoPro\\ophtalmopro-main\\eid-bridge-app\\eidbridge.csproj": {}
+    "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\eidbridge.csproj": {}
   },
   "projects": {
-    "D:\\OphtalmoPro\\ophtalmopro-main\\eid-bridge-app\\eidbridge.csproj": {
+    "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\eidbridge.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\OphtalmoPro\\ophtalmopro-main\\eid-bridge-app\\eidbridge.csproj",
+        "projectUniqueName": "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\eidbridge.csproj",
         "projectName": "eidbridge",
-        "projectPath": "D:\\OphtalmoPro\\ophtalmopro-main\\eid-bridge-app\\eidbridge.csproj",
+        "projectPath": "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\eidbridge.csproj",
         "packagesPath": "C:\\Users\\thebe\\.nuget\\packages\\",
-        "outputPath": "D:\\OphtalmoPro\\ophtalmopro-main\\eid-bridge-app\\obj\\",
+        "outputPath": "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

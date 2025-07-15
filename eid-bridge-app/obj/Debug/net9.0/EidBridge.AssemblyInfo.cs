@@ -10,12 +10,12 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("EidBridge")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("eidbridge")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
-[assembly: System.Reflection.AssemblyProductAttribute("EidBridge")]
-[assembly: System.Reflection.AssemblyTitleAttribute("EidBridge")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8614b7b1ae1e8c4df681f26bfa8681aa477924f5")]
+[assembly: System.Reflection.AssemblyProductAttribute("eidbridge")]
+[assembly: System.Reflection.AssemblyTitleAttribute("eidbridge")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 
 // Généré par la classe MSBuild WriteCodeFragment.

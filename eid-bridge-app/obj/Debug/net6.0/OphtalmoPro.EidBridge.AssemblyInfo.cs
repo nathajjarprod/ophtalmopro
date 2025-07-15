@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright © OphtalmoPro 2024")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Service de lecture sécurisée des cartes eID belges pour OphtalmoPro")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8614b7b1ae1e8c4df681f26bfa8681aa477924f5")]
 [assembly: System.Reflection.AssemblyProductAttribute("OphtalmoPro eID Bridge")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OphtalmoPro.EidBridge")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -41,3 +41,12 @@ D:\OphtalmoPro\ophtalmopro-main\eid-bridge-app\obj\Debug\net9.0\refint\eidbridge
 D:\OphtalmoPro\ophtalmopro-main\eid-bridge-app\obj\Debug\net9.0\eidbridge.pdb
 D:\OphtalmoPro\ophtalmopro-main\eid-bridge-app\obj\Debug\net9.0\eidbridge.genruntimeconfig.cache
 D:\OphtalmoPro\ophtalmopro-main\eid-bridge-app\obj\Debug\net9.0\ref\eidbridge.dll
+C:\Users\thebe\Documents\GitHub\ophtalmopro\eid-bridge-app\obj\Debug\net9.0\eidbridge.csproj.AssemblyReference.cache
+C:\Users\thebe\Documents\GitHub\ophtalmopro\eid-bridge-app\obj\Debug\net9.0\rpswa.dswa.cache.json
+C:\Users\thebe\Documents\GitHub\ophtalmopro\eid-bridge-app\obj\Debug\net9.0\eidbridge.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\thebe\Documents\GitHub\ophtalmopro\eid-bridge-app\obj\Debug\net9.0\eidbridge.AssemblyInfoInputs.cache
+C:\Users\thebe\Documents\GitHub\ophtalmopro\eid-bridge-app\obj\Debug\net9.0\eidbridge.AssemblyInfo.cs
+C:\Users\thebe\Documents\GitHub\ophtalmopro\eid-bridge-app\obj\Debug\net9.0\eidbridge.csproj.CoreCompileInputs.cache
+C:\Users\thebe\Documents\GitHub\ophtalmopro\eid-bridge-app\obj\Debug\net9.0\eidbridge.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\thebe\Documents\GitHub\ophtalmopro\eid-bridge-app\obj\Debug\net9.0\eidbridge.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\thebe\Documents\GitHub\ophtalmopro\eid-bridge-app\obj\Debug\net9.0\eidbridge.sourcelink.json

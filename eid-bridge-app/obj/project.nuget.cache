@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "I34Yase6rdg=",
+  "dgSpecHash": "UqcbqZkWNkg=",
   "success": true,
-  "projectFilePath": "D:\\OphtalmoPro\\ophtalmopro-main\\eid-bridge-app\\eidbridge.csproj",
+  "projectFilePath": "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\eidbridge.csproj",
   "expectedPackageFiles": [
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.aspnetcore.cors\\2.2.0\\microsoft.aspnetcore.cors.2.2.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.aspnetcore.http.abstractions\\2.2.0\\microsoft.aspnetcore.http.abstractions.2.2.0.nupkg.sha512",
