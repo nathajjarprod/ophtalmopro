@@ -31,6 +31,23 @@ namespace OphtalmoPro.EidBridge.Controllers
             _securityService = securityService;
             _auditService = auditService;
         }
+    
+        [HttpGet("readers")]
+        public async Task<ActionResult<List<ReaderInfo>>> GetReaders()
+        {
+            try
+             {
+                var readers = await _cardReaderService.GetAvailableReadersAsync();
+                return Ok(readers);
+            }
+             catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur lors de la récupération des lecteurs");
+                return StatusCode(500, new { error = "Erreur lors de la récupération des lecteurs" });
+             }
+        }
+
+
 
         /// <summary>
         /// Obtient le statut du service eID Bridge
@@ -218,32 +235,8 @@ namespace OphtalmoPro.EidBridge.Controllers
         /// <summary>
         /// Obtient la liste des lecteurs de cartes disponibles
         /// </summary>
-        [HttpGet("readers")]
-        public async Task<ActionResult<ReadersResponse>> GetReaders()
-        {
-            try
-            {
-                var readers = await _cardReaderService.GetAvailableReadersAsync();
-                
-                return Ok(new ReadersResponse
-                {
-                    Success = true,
-                    Readers = readers.Select(r => new ReaderInfo
-                    {
-                        Name = r.Name,
-                        HasCard = r.HasCard,
-                        Status = r.Status,
-                        LastActivity = r.LastActivity
-                    }).ToList(),
-                    Timestamp = DateTime.UtcNow
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Erreur lors de la récupération des lecteurs");
-                return StatusCode(500, new { error = "Erreur lors de la récupération des lecteurs" });
-            }
-        }
+        
+       
 
         /// <summary>
         /// Génère un token d'authentification temporaire

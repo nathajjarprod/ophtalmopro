@@ -19,7 +19,7 @@ namespace OphtalmoPro.EidBridge.Middleware
             var requestId = Guid.NewGuid().ToString("N")[..8];
             
             // Ajouter l'ID de requête aux headers de réponse
-            context.Response.Headers.Add("X-Request-ID", requestId);
+            context.Response.Headers.Append("X-Request-ID", requestId);
             
             var clientIp = context.Connection.RemoteIpAddress?.ToString();
             var userAgent = context.Request.Headers["User-Agent"].ToString();

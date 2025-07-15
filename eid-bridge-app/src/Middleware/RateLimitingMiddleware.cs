@@ -41,7 +41,7 @@ namespace OphtalmoPro.EidBridge.Middleware
                         clientIp, clientInfo.RequestTimes.Count);
                     
                     context.Response.StatusCode = 429; // Too Many Requests
-                    context.Response.Headers.Add("Retry-After", "60");
+                    context.Response.Headers.Append("Retry-After", "60");
                     return;
                 }
                 
