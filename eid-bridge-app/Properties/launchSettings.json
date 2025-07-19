@@ -1,13 +1,15 @@
 {
   "profiles": {
     "OphtalmoPro.EidBridge": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "applicationUrl": "https://localhost:8443",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+  "commandName": "Project",
+  "dotnetRunMessages": true,
+  "launchBrowser": true,
+  "launchUrl": "eid-test-swelio.html",
+  "applicationUrl": "https://localhost:8443",
+  "environmentVariables": {
+    "ASPNETCORE_ENVIRONMENT": "Development"
+  }
+}
     },
     "OphtalmoPro.EidBridge.Alternative": {
       "commandName": "Project",
@@ -28,4 +30,3 @@
       }
     }
   }
-}

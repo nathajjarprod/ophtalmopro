@@ -13,54 +13,48 @@ namespace OphtalmoPro.EidBridge
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
+        public Startup(IConfiguration configuration) => Configuration = configuration;
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // Configuration JSON avec options personnalisées
+            // JSON config
             services.Configure<JsonSerializerOptions>(options =>
             {
                 options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.WriteIndented = true;
             });
 
-            // Services principaux
+            // API controllers
             services.AddControllers();
 
-            // Services métier
+            // CORS: pour localhost uniquement
+            services.AddCors(options =>
+            {
+                options.AddPolicy("LocalhostOnly", builder =>
+                {
+                    builder.WithOrigins(
+                        "https://localhost:5173",
+                        "https://localhost:3000",
+                        "https://127.0.0.1:5173",
+                        "https://127.0.0.1:3000",
+                        "https://localhost:8443",
+                        "https://127.0.0.1:8443"
+                    )
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+                });
+            });
+
+            // Services eID
             services.AddScoped<IEidMiddlewareService, EidMiddlewareService>();
             services.AddSingleton<ICardReaderService, CardReaderService>();
             services.AddSingleton<ISecurityService, SecurityService>();
             services.AddSingleton<IAuditService, AuditService>();
             services.AddScoped<IEidDataService, EidDataService>();
 
-            // Configuration CORS restrictive
-            services.AddCors(options =>
-            {
-                options.AddPolicy("LocalhostOnly", builder =>
-                {
-                    builder
-                        .WithOrigins(
-                            "https://localhost:5173",
-                            "https://localhost:3000",
-                            "https://127.0.0.1:5173",
-                            "https://127.0.0.1:3000",
-                            "https://localhost:8443",
-                            "https://127.0.0.1:8443"
-                        )
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials()
-                        .SetIsOriginAllowedToAllowWildcardSubdomains();
-                });
-            });
-
-            // Documentation API Swagger (développement uniquement)
+            // Swagger (si activé)
             if (Configuration.GetValue<bool>("EnableSwagger", false))
             {
                 services.AddSwaggerGen(c =>
@@ -68,34 +62,15 @@ namespace OphtalmoPro.EidBridge
                     c.SwaggerDoc("v1", new OpenApiInfo
                     {
                         Title = "OphtalmoPro eID Bridge API",
-                        Version = "v1.0",
-                        Description = "API sécurisée pour la lecture de cartes eID belges"
-                    });
-                    
-                    // Configuration sécurité JWT
-                    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                    {
-                        Description = "JWT Authorization header using the Bearer scheme",
-                        Name = "Authorization",
-                        In = ParameterLocation.Header,
-                        Type = SecuritySchemeType.ApiKey,
-                        Scheme = "Bearer"
+                        Version = "v1.0"
                     });
                 });
             }
 
-            // Service de santé pour monitoring
+            // Health checks
             services.AddHealthChecks()
                 .AddCheck<EidMiddlewareHealthCheck>("eid-middleware")
                 .AddCheck<CardReaderHealthCheck>("card-readers");
-
-            // Configuration logging avancé
-            services.AddLogging(builder =>
-            {
-                builder.AddFilter("Microsoft", LogLevel.Warning);
-                builder.AddFilter("System", LogLevel.Warning);
-                builder.AddFilter("OphtalmoPro.EidBridge", LogLevel.Information);
-            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -103,7 +78,7 @@ namespace OphtalmoPro.EidBridge
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                
+
                 if (Configuration.GetValue<bool>("EnableSwagger", false))
                 {
                     app.UseSwagger();
@@ -120,21 +95,25 @@ namespace OphtalmoPro.EidBridge
                 app.UseHsts();
             }
 
-            // Middleware personnalisés
+            // Sécurité, logs, et limitations
             app.UseMiddleware<SecurityHeadersMiddleware>();
             app.UseMiddleware<RequestLoggingMiddleware>();
             app.UseMiddleware<RateLimitingMiddleware>();
 
-            // Configuration standard
             app.UseHttpsRedirection();
-            app.UseRouting();
+
+            // 🔐 CORS
             app.UseCors("LocalhostOnly");
-            
-            // Authentification JWT
+            app.UseMiddleware<DynamicHtmlWithNonceMiddleware>();
+            // 📁 Fichiers statiques (pour /eid-test-swelio.html, etc.)
+            app.UseStaticFiles();
+
+            // Routing
+            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
 
-            // Health checks
+            // Health check
             app.UseHealthChecks("/health");
 
             // Routes API
@@ -144,23 +123,28 @@ namespace OphtalmoPro.EidBridge
                 endpoints.MapHealthChecks("/health/detailed").RequireAuthorization();
             });
 
-            // Page d'accueil simple
-            app.Run(async context =>
-            {
-                if (context.Request.Path == "/")
-                {
-                    context.Response.ContentType = "text/html";
-                    var port = context.Request.Host.Port ?? int.Parse(Environment.GetEnvironmentVariable("SELECTED_PORT") ?? "8443");
-                    await context.Response.WriteAsync(@"
+            // Page d'accueil ("/")
+           app.Run(async context =>
+{
+    if (context.Request.Path == "/")
+    {
+        context.Response.ContentType = "text/html";
+
+        var port = context.Request.Host.Port ?? int.Parse(Environment.GetEnvironmentVariable("SELECTED_PORT") ?? "8443");
+
+        // Récupère le nonce généré par le middleware CSP
+        var nonce = context.Items["CSPNonce"] as string ?? "";
+
+        await context.Response.WriteAsync($@"
 <!DOCTYPE html>
 <html>
 <head>
     <title>OphtalmoPro eID Bridge</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .status { padding: 20px; border-radius: 8px; margin: 20px 0; }
-        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
-        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+    <style nonce=""{nonce}"">
+        body {{ font-family: Arial, sans-serif; margin: 40px; }}
+        .status {{ padding: 20px; border-radius: 8px; margin: 20px 0; }}
+        .success {{ background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }}
+        .info {{ background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }}
     </style>
 </head>
 <body>
@@ -169,17 +153,21 @@ namespace OphtalmoPro.EidBridge
         ✅ Service opérationnel
     </div>
     <div class='status info'>
-        📡 API disponible sur : <strong>https://localhost:" + port + @"/api/</strong><br>
+        📡 API disponible sur : <strong>https://localhost:{port}/api/</strong><br>
         📊 Santé du service : <a href='/health'>Vérifier</a><br>
         📚 Documentation : <a href='/api-docs'>API Docs</a>
     </div>
     <p><strong>Version :</strong> 1.0.0</p>
-    <p><strong>Démarré :</strong> " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + @"</p>
-    <p><strong>Port :</strong> " + port + @"</p>
+    <p><strong>Démarré :</strong> {DateTime.Now:yyyy-MM-dd HH:mm:ss}</p>
+    <p><strong>Port :</strong> {port}</p>
+
+    <script nonce=""{nonce}"">
+        console.log('eID Bridge en ligne sur le port {port}');
+    </script>
 </body>
 </html>");
-                }
-            });
+    }
+});
         }
     }
 }

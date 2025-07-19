@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\eidbridge.csproj": {}
+    "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\EidBridge.csproj": {}
   },
   "projects": {
-    "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\eidbridge.csproj": {
+    "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\EidBridge.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\eidbridge.csproj",
-        "projectName": "eidbridge",
-        "projectPath": "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\eidbridge.csproj",
+        "projectUniqueName": "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\EidBridge.csproj",
+        "projectName": "EidBridge",
+        "projectPath": "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\EidBridge.csproj",
         "packagesPath": "C:\\Users\\thebe\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\obj\\",
         "projectStyle": "PackageReference",
@@ -20,14 +20,14 @@
           "C:\\Users\\thebe\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "net9.0"
+          "net9.0-windows"
         ],
         "sources": {
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net9.0": {
-            "targetAlias": "net9.0",
+          "net9.0-windows7.0": {
+            "targetAlias": "net9.0-windows",
             "projectReferences": {}
           }
         },
@@ -44,8 +44,8 @@
         "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
-        "net9.0": {
-          "targetAlias": "net9.0",
+        "net9.0-windows7.0": {
+          "targetAlias": "net9.0-windows",
           "dependencies": {
             "Microsoft.AspNetCore.Cors": {
               "target": "Package",
@@ -62,6 +62,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[9.0.3, )"
+            },
+            "System.Drawing.Common": {
+              "target": "Package",
+              "version": "[9.0.7, )"
             },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
@@ -85,6 +89,9 @@
             },
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
+            },
+            "Microsoft.WindowsDesktop.App.WindowsForms": {
+              "privateAssets": "none"
             }
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"

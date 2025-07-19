@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "UqcbqZkWNkg=",
+  "dgSpecHash": "7esR7VyHANI=",
   "success": true,
-  "projectFilePath": "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\eidbridge.csproj",
+  "projectFilePath": "C:\\Users\\thebe\\Documents\\GitHub\\ophtalmopro\\eid-bridge-app\\EidBridge.csproj",
   "expectedPackageFiles": [
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.aspnetcore.cors\\2.2.0\\microsoft.aspnetcore.cors.2.2.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.aspnetcore.http.abstractions\\2.2.0\\microsoft.aspnetcore.http.abstractions.2.2.0.nupkg.sha512",
@@ -43,6 +43,7 @@
     "C:\\Users\\thebe\\.nuget\\packages\\microsoft.identitymodel.tokens\\8.12.1\\microsoft.identitymodel.tokens.8.12.1.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.net.http.headers\\2.2.0\\microsoft.net.http.headers.2.2.0.nupkg.sha512",
     "C:\\Users\\thebe\\.nuget\\packages\\microsoft.openapi\\1.6.23\\microsoft.openapi.1.6.23.nupkg.sha512",
+    "C:\\Users\\thebe\\.nuget\\packages\\microsoft.win32.systemevents\\9.0.7\\microsoft.win32.systemevents.9.0.7.nupkg.sha512",
     "C:\\Users\\thebe\\.nuget\\packages\\swashbuckle.aspnetcore\\9.0.3\\swashbuckle.aspnetcore.9.0.3.nupkg.sha512",
     "C:\\Users\\thebe\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\9.0.3\\swashbuckle.aspnetcore.swagger.9.0.3.nupkg.sha512",
     "C:\\Users\\thebe\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\9.0.3\\swashbuckle.aspnetcore.swaggergen.9.0.3.nupkg.sha512",
@@ -50,6 +51,7 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\system.buffers\\4.5.0\\system.buffers.4.5.0.nupkg.sha512",
     "C:\\Users\\thebe\\.nuget\\packages\\system.diagnostics.diagnosticsource\\9.0.0-preview.4.24266.19\\system.diagnostics.diagnosticsource.9.0.0-preview.4.24266.19.nupkg.sha512",
     "C:\\Users\\thebe\\.nuget\\packages\\system.diagnostics.eventlog\\9.0.0-preview.4.24266.19\\system.diagnostics.eventlog.9.0.0-preview.4.24266.19.nupkg.sha512",
+    "C:\\Users\\thebe\\.nuget\\packages\\system.drawing.common\\9.0.7\\system.drawing.common.9.0.7.nupkg.sha512",
     "C:\\Users\\thebe\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.12.1\\system.identitymodel.tokens.jwt.8.12.1.nupkg.sha512",
     "C:\\Users\\thebe\\.nuget\\packages\\system.serviceprocess.servicecontroller\\9.0.0-preview.4.24266.19\\system.serviceprocess.servicecontroller.9.0.0-preview.4.24266.19.nupkg.sha512",
     "C:\\Users\\thebe\\.nuget\\packages\\system.text.encodings.web\\9.0.0-preview.4.24266.19\\system.text.encodings.web.9.0.0-preview.4.24266.19.nupkg.sha512",

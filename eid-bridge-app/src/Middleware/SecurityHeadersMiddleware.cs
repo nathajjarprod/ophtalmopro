@@ -1,28 +1,46 @@
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+
 namespace OphtalmoPro.EidBridge.Middleware
 {
     public class SecurityHeadersMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<SecurityHeadersMiddleware> _logger;
+        private readonly IWebHostEnvironment _env;
 
-        public SecurityHeadersMiddleware(RequestDelegate next, ILogger<SecurityHeadersMiddleware> logger)
+        public SecurityHeadersMiddleware(RequestDelegate next, ILogger<SecurityHeadersMiddleware> logger, IWebHostEnvironment env)
         {
             _next = next;
             _logger = logger;
+            _env = env;
         }
 
-      public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
-          context.Response.Headers["X-Content-Type-Options"] = "nosniff";
-          context.Response.Headers.Append("X-Frame-Options", "DENY");
-          context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
-          context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
-          context.Response.Headers.Append("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'");
+            // 🔐 Génère un nonce aléatoire
+            var nonceBytes = RandomNumberGenerator.GetBytes(16);
+            var nonce = Convert.ToBase64String(nonceBytes);
 
-        context.Response.Headers.Remove("Server");
-         context.Response.Headers.Remove("X-Powered-By");
+            // 💾 Stocke le nonce dans le contexte pour y accéder dans Startup.cs
+            context.Items["CSPNonce"] = nonce;
 
-          await _next(context);
+            // 📋 En-têtes de sécurité
+            context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+            context.Response.Headers["X-Frame-Options"] = "DENY";
+            context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+            context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+
+            // ✅ CSP avec nonce
+            context.Response.Headers["Content-Security-Policy"] =
+                $"default-src 'self'; script-src 'self' 'nonce-{nonce}'; style-src 'self' 'nonce-{nonce}';";
+
+            // Masquer infos serveur
+            context.Response.Headers.Remove("Server");
+            context.Response.Headers.Remove("X-Powered-By");
+
+            await _next(context);
         }
     }
 }

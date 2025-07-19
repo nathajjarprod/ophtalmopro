@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Test eID Bridge avec Swelio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        ul ul {
+            padding-left: 20px;
+            border-left: 2px solid #ccc;
+            margin-left: 10px;
+        }
+        ul li {
+            margin-bottom: 4px;
+        }
+        img.eid-photo {
+            max-width: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔐 Test eID Bridge avec Swelio</h1>
+
+  <button id="btnTestSSL">Test SSL</button>
+<button id="btnTestStatus">Test Status</button>
+<button id="btnTestReadCard">Test Lecture Carte</button>
+<button id="btnTestDiagnostic">Test Diagnostic</button>
+<button id="btnTestCurl">Commande CURL</button>
+
+    <div id="results"></div>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+
+        function showResult(title, content, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${title}</strong><br><pre>${JSON.stringify(content, null, 2)}</pre>`;
+            resultsDiv.appendChild(div);
+        }
+
+        function showLoading(message) {
+            const div = document.createElement('div');
+            div.className = 'status info';
+            div.innerHTML = `<div class="loading"></div> ${message}`;
+            resultsDiv.appendChild(div);
+            return div;
+        }
+
+        function createListFromObject(obj) {
+            if (!obj) return '<em>Aucune donnée</em>';
+            let html = '<ul>';
+            for (const key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    const val = obj[key];
+                    if (val && typeof val === 'object') {
+                        html += `<li><strong>${key}</strong>: ${createListFromObject(val)}</li>`;
+                    } else {
+                        html += `<li><strong>${key}</strong>: ${val}</li>`;
+                    }
+                }
+            }
+            html += '</ul>';
+            return html;
+        }
+
+        async function testSSL() {
+            const loading = showLoading('Test SSL...');
+            try {
+                const response = await fetch('https://localhost:8443/', { mode: 'no-cors' });
+                loading.remove();
+                showResult('✅ SSL OK', 'Certificat accepté', 'success');
+            } catch (error) {
+                loading.remove();
+                showResult('❌ SSL', { error: error.message }, 'error');
+            }
+        }
+
+        async function testStatus() {
+            const loading = showLoading('Vérification du status...');
+            try {
+                const response = await fetch('https://localhost:8443/api/eid/status');
+                const data = await response.json();
+                loading.remove();
+                showResult('✅ Status API', data, 'success');
+            } catch (error) {
+                loading.remove();
+                showResult('❌ Status API', error.message, 'error');
+            }
+        }
+
+        async function testReadCard() {
+            const loading = showLoading('Lecture de la carte eID...');
+            try {
+                const response = await fetch('https://localhost:8443/api/eid/read', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ includePhoto: true, includeAddress: true })
+                });
+                const data = await response.json();
+                loading.remove();
+
+                if (data.cardNumber || data.identity) {
+                    const div = document.createElement('div');
+                    div.className = 'status success';
+                    div.innerHTML = `<strong>✅ Données eID :</strong><br>` + createListFromObject(data);
+
+                    // Afficher la photo si elle existe (base64)
+                    if (data.photo) {
+                        const img = document.createElement('img');
+                        img.src = `data:image/jpeg;base64,${data.photo}`;
+                        img.alt = 'Photo eID';
+                        img.className = 'eid-photo';
+                        div.appendChild(img);
+                    }
+                    resultsDiv.appendChild(div);
+                } else {
+                    showResult('⚠️ Résultat partiel ou erreur', data, 'warning');
+                }
+            } catch (error) {
+                loading.remove();
+                showResult('❌ Lecture carte', error.message, 'error');
+            }
+        }
+
+        async function testDiagnostic() {
+            const loading = showLoading('Diagnostic en cours...');
+            try {
+                const response = await fetch('https://localhost:8443/api/eid/diagnostic');
+                const data = await response.json();
+                loading.remove();
+                showResult('✅ Diagnostic', data, 'success');
+            } catch (error) {
+                loading.remove();
+                showResult('❌ Diagnostic', error.message, 'error');
+            }
+        }
+
+        function testWithCurl() {
+            showResult('💻 Commande CURL', {
+                commande: 'curl -k https://localhost:8443/api/eid/status',
+                note: 'Utilisez -k pour ignorer le certificat auto-signé'
+            }, 'info');
+                    }
+
+document.getElementById('btnTestSSL').addEventListener('click', testSSL);
+document.getElementById('btnTestStatus').addEventListener('click', testStatus);
+document.getElementById('btnTestReadCard').addEventListener('click', testReadCard);
+document.getElementById('btnTestDiagnostic').addEventListener('click', testDiagnostic);
+document.getElementById('btnTestCurl').addEventListener('click', testWithCurl);
+</script
+>
+</div>
+</body>
+</html>

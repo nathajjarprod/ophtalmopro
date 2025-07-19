@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using ThreadingTimer = System.Threading.Timer;
 
 namespace OphtalmoPro.EidBridge.Middleware
 {
@@ -8,7 +9,7 @@ namespace OphtalmoPro.EidBridge.Middleware
         private readonly ILogger<RateLimitingMiddleware> _logger;
         private readonly IConfiguration _configuration;
         private readonly ConcurrentDictionary<string, ClientRequestInfo> _clients = new();
-        private readonly Timer _cleanupTimer;
+        private ThreadingTimer _cleanupTimer;
 
         public RateLimitingMiddleware(RequestDelegate next, ILogger<RateLimitingMiddleware> logger, IConfiguration configuration)
         {
@@ -17,7 +18,7 @@ namespace OphtalmoPro.EidBridge.Middleware
             _configuration = configuration;
             
             // Nettoyer les anciennes entrées toutes les minutes
-            _cleanupTimer = new Timer(CleanupOldEntries!, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+            _cleanupTimer = new ThreadingTimer(CleanupOldEntries!, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
         }
 
         public async Task InvokeAsync(HttpContext context)

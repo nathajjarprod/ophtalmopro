@@ -1,9 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UseWindowsForms>true</UseWindowsForms>
+    <SupportedOSPlatformVersion>6.1</SupportedOSPlatformVersion>
     <RootNamespace>OphtalmoPro.EidBridge</RootNamespace>
   </PropertyGroup>
 
@@ -11,10 +13,37 @@
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="9.0.0-preview.4.24266.19" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.7" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.12.1" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.12.1" />
     
+   
+    <!-- Référence au wrapper .NET Swelio -->
+  <Reference Include="Swelio.Engine">
+    <!-- Chemin vers la DLL .NET -->
+    <HintPath>lib\swelio\swelio.engine.dll</HintPath>
+    <Private>true</Private>
+  </Reference>
+</ItemGroup>
 
+<!-- Copier les dépendances natives x86/x64 dans le dossier de sortie -->
+<ItemGroup>
+  <None Include="lib\swelio\Swelio32.dll">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Include="lib\swelio\Swelio64.dll">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+</ItemGroup>
+
+<!-- Copier les fichiers de debug ou métadonnées si besoin -->
+<ItemGroup>
+  <None Include="lib\swelio\swelio.engine.pdb">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Include="lib\swelio\swelio.engine.deps.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
   </ItemGroup>
 
 </Project>
